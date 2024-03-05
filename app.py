@@ -102,13 +102,10 @@ live_merged['holes_remaining'] = np.where(live_merged['position']=='CUT',0,live_
 team_score = live_merged.groupby('team')[['total']].sum()
 
 thru_cut = pd.DataFrame(live_merged[live_merged.position !='CUT']['team'].value_counts())
-# thru_cut = thru_cut.rename(columns={'Team':'Thru Cut'})
-df_holes_remaining = live_merged.groupby('team')['holes_remaining'].sum().sort_values()#by='holes_remaining',ascending=False)
-df_holes_remaining = pd.DataFrame(df_holes_remaining)#.rename(columns={'holes_remaining':'Holes Remaining'})
+df_holes_remaining = pd.DataFrame(live_merged.groupby('team')['holes_remaining'].sum())
 
 table = pd.merge(thru_cut,df_holes_remaining, left_index=True, right_index=True)
 table = table.merge(team_score, left_index=True, right_index=True).reset_index().rename(columns={'index':'Team','team':'Thru Cut','holes_remaining':'Holes Remaining','total':'Team Score'})
-# table = pd.DataFrame(table[['Team Score','Holes Remaining','Thru Cut']])
 
 st.write("")
 st.header('Arnold Palmer Invitational')
@@ -116,7 +113,7 @@ st.caption("Week 9")
 st.markdown("###")
 st.markdown("###")
 st.markdown('TEAM KPIs')
-st.dataframe(table,hide_index=True,use_container_width=True)
+st.dataframe(table)#,hide_index=True,use_container_width=True)
 st.markdown("###")
 st.markdown("###")
 st.markdown('LEADERBOARD')
