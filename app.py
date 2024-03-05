@@ -95,6 +95,26 @@ def highlight_rows(row):
         color = '#a5aa99' # Grey
     return ['background-color: {}'.format(color) for r in row]
 
+def highlight_rows2(row):
+    value = row.index
+    if value == 'unit_circle':
+        color = '#FFCCE5' # Pink
+    elif value == 'Philly919':
+        color = '#7f3c8d' # Purple
+    elif value == 'AlphaWired':
+        color = '#3969ac' # Blue
+    elif value == 'Sneads Foot':
+        color = '#f2b701' # Gold
+    elif value == 'New Team 4':
+        color = '#e73f74' # Magenta
+    elif value == 'Team Gamble':
+        color = '#e68310' # Orange
+    elif value == 'txmoonshine':
+        color = '#00868b' # Aqua
+    else:
+        color = '#a5aa99' # Grey
+    return ['background-color: {}'.format(color) for r in row]
+
 
 live_merged['holes_remaining'] = (72 - (live_merged['Thru']).fillna(0))
 live_merged['holes_remaining'] = np.where(live_merged['Pos']=='CUT',0,live_merged['holes_remaining']).astype('int')
@@ -105,17 +125,18 @@ thru_cut = pd.DataFrame(live_merged[live_merged.Pos!='CUT']['Team'].value_counts
 thru_cut = thru_cut.rename(columns={'Team':'Thru Cut'})
 df_holes_remaining = live_merged.groupby('Team')['holes_remaining'].sum().sort_values()#by='holes_remaining',ascending=False)
 df_holes_remaining = pd.DataFrame(df_holes_remaining).rename(columns={'holes_remaining':'Holes Left'})
-table = pd.merge(thru_cut,df_holes_remaining, left_index=True, right_index=True).T
+table = pd.merge(thru_cut,df_holes_remaining, left_index=True, right_index=True)
 
-# st.write("")
-st.write("Week 9")
-st.subheader('Arnold Palmer Invitational')
+st.header('Arnold Palmer Invitational')
+st.caption("Week 9")
 st.markdown("###")
 st.markdown("###")
-st.markdown('Thru Cut and Holes Remaining')
-st.dataframe(table,height=125,hide_index=True,use_container_width=True)
+st.markdown('THRU CUT  /  HOLES REMAINING')
+st.dataframe(table,use_container_width=True)
+st.markdown("###")
+st.markdown("###")
+st.markdown('LEADERBOARD')
 st.dataframe(live_merged[['Player','Team','Pos','Total','Round','Thru']].style.apply(highlight_rows, axis=1),hide_index=True,height=1800,use_container_width=True)
-# st.table(live_merged.style.apply(highlight_rows, axis=1))
 
 
 
