@@ -67,13 +67,13 @@ live_merged = pd.merge(teams, live, how='left', left_index=True, right_index=Tru
 live_merged_copy = live_merged.copy()
 live_merged[['total','round','thru']] = live_merged[['total','round','thru']].astype('int')#.rename(columns={'position':'Pos','total':'Total','round':'Round','thru':'Thru'})
 
-live_merged = (
-    live_merged
-#     .reset_index()
-    .rename(columns={
-        'player':'Player','team':'Team','position':'Pos','total':'Total','round':'Round','thru':'Thru Cut'}
-           )
-)
+# live_merged = (
+#     live_merged
+# #     .reset_index()
+#     .rename(columns={
+#         'player':'Player','team':'Team','position':'Pos','total':'Total','round':'Round','thru':'Thru Cut'}
+#            )
+# )
 
 def highlight_rows(row):
     value = row.loc['Team']
@@ -96,18 +96,18 @@ def highlight_rows(row):
     return ['background-color: {}'.format(color) for r in row]
 
 
-live_merged['holes_remaining'] = (72 - (live_merged['Thru Cut']).fillna(0))
-live_merged['holes_remaining'] = np.where(live_merged['Pos']=='CUT',0,live_merged['holes_remaining']).astype('int')
+live_merged['holes_remaining'] = (72 - (live_merged['thru']).fillna(0))
+live_merged['holes_remaining'] = np.where(live_merged['position']=='CUT',0,live_merged['holes_remaining']).astype('int')
 
-team_score = live_merged.reset_index().groupby('Team')[['Total']].sum()
+team_score = live_merged.groupby('team')[['total']].sum()
 
-thru_cut = pd.DataFrame(live_merged[live_merged.Pos!='CUT']['Team'].value_counts())
-thru_cut = thru_cut.rename(columns={'Team':'Thru Cut'})
-df_holes_remaining = live_merged.groupby('Team')['holes_remaining'].sum().sort_values()#by='holes_remaining',ascending=False)
-df_holes_remaining = pd.DataFrame(df_holes_remaining).rename(columns={'holes_remaining':'Holes Remaining'})
+thru_cut = pd.DataFrame(live_merged[live_merged.position !='CUT']['team'].value_counts())
+# thru_cut = thru_cut.rename(columns={'Team':'Thru Cut'})
+df_holes_remaining = live_merged.groupby('team')['holes_remaining'].sum().sort_values()#by='holes_remaining',ascending=False)
+df_holes_remaining = pd.DataFrame(df_holes_remaining)#.rename(columns={'holes_remaining':'Holes Remaining'})
 
 table = pd.merge(thru_cut,df_holes_remaining, left_index=True, right_index=True)
-table = table.merge(team_score.rename(columns={'Total':'Team Score'}), left_index=True, right_index=True)
+table = table.merge(team_score, left_index=True, right_index=True).reset_index().rename(columns={'index':'Team','team':'Thru Cut','holes_remaining':'Holes Remaining','total':'Team Score'})
 # table = pd.DataFrame(table[['Team Score','Holes Remaining','Thru Cut']])
 
 st.write("")
@@ -116,11 +116,11 @@ st.caption("Week 9")
 st.markdown("###")
 st.markdown("###")
 st.markdown('TEAM KPIs')
-st.dataframe(table,use_container_width=True)
+st.dataframe(table,hide_index=True,use_container_width=True)
 st.markdown("###")
 st.markdown("###")
 st.markdown('LEADERBOARD')
-st.dataframe(live_merged[['Player','Team','Pos','Total','Round','Thru Cut']].style.apply(highlight_rows, axis=1),hide_index=True,height=1800,use_container_width=True)
+st.dataframe(live_merged[['player','team','position','total','round','thru']].rename(columns={'player':'Player','team':'Team','position':'Pos','total':'Total','round':'Rnd','thru':'Thru'}).style.apply(highlight_rows, axis=1),hide_index=True,height=1800,use_container_width=True)
 
 
 
