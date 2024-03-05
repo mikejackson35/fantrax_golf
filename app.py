@@ -99,21 +99,29 @@ def highlight_rows2(row):
     value = row.loc['Team']
     if value == 'unit_circle':
         color = '#FFCCE5' # Pink
+        opacity = 0.25
     elif value == 'Philly919':
         color = '#7f3c8d' # Purple
+        opacity = 0.25
     elif value == 'AlphaWired':
         color = '#3969ac' # Blue
+        opacity = 0.25
     elif value == 'Sneads Foot':
         color = '#f2b701' # Gold
+        opacity = 0.25
     elif value == 'New Team 4':
         color = '#e73f74' # Magenta
+        opacity = 0.25
     elif value == 'Team Gamble':
         color = '#e68310' # Orange
+        opacity = 0.25
     elif value == 'txmoonshine':
         color = '#00868b' # Aqua
+        opacity = 0.25
     else:
         color = '#a5aa99' # Grey
-    return ['background-color: {}; opacity: 0.25'.format(color) for r in row]
+        opacity = 0.25
+    return ['background-color: {};'.format(color,opacity) for r in row]
 
 
 live_merged['holes_remaining'] = (72 - (live_merged['thru']).fillna(0))
