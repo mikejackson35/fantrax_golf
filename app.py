@@ -136,7 +136,7 @@ st.dataframe(table,use_container_width=True)
 st.markdown("###")
 st.markdown("###")
 st.markdown('LEADERBOARD')
-st.dataframe(live_merged[['Player','Team','Pos','Total','Round','Thru']].style.apply(highlight_rows, axis=1),hide_index=True,height=1800,use_container_width=True)
+st.dataframe(live_merged[['Player','Team','Pos','Total','Round','Thru']].style.apply(highlight_rows, axis=1),hide_index=True,height=1800)#,use_container_width=True)
 
 
 
