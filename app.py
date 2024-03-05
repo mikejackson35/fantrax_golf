@@ -9,6 +9,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+st.write("#")
 st.markdown("""
 <style>
             
@@ -144,8 +145,6 @@ df_holes_remaining = pd.DataFrame(live_merged.groupby('team')['holes_remaining']
 table = pd.merge(thru_cut,df_holes_remaining, left_index=True, right_index=True)
 table = table.merge(team_score, left_index=True, right_index=True).reset_index().rename(columns={'count':'Thru Cut','team':'Team','holes_remaining':'Holes Remaining','total':'Team Score'})
 
-
-st.write("")
 st.header('Arnold Palmer Invitational')
 st.caption("Week 9")
 st.sidebar.dataframe(table.sort_values(by='Team Score').style.apply(highlight_rows2, axis=1),hide_index=True,use_container_width=True)
