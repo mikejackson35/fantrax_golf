@@ -55,7 +55,7 @@ def get_fantrax():
 teams = get_fantrax()
 
 teams.columns = ['player','team','active_reserve']
-teams_dict = {'919':'Philly919','u_c':'unit_circle','NT 4':'New Team 4','NT 8':'Sneads Shoe','txms':'txmoonshine','MG':'Team Gamble','grrr':'Putt Pirates','[AW]':'AlphaWired'}
+teams_dict = {'919':'Philly919','u_c':'unit_circle','NT 4':'New Team 4','NT 8':'Sneads Foot','txms':'txmoonshine','MG':'Team Gamble','grrr':'Putt Pirates','[AW]':'AlphaWired'}
 teams['team'] = teams.team.map(teams_dict)
 teams = teams.loc[teams.active_reserve=='Active'].set_index('player')
 
