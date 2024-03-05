@@ -171,7 +171,7 @@ df_holes_remaining = df_holes_remaining.T#.set_index('team').T
 
 st.markdown("")
 st.sidebar.caption("Week 9")
-st.sidebar.header('Arnold Palmer Invitational',divider='grey')
+st.sidebar.title('Arnold Palmer Invitational')
 st.sidebar.markdown("###")
 st.sidebar.markdown("###")
 st.markdown("###")
