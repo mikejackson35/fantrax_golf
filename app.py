@@ -67,6 +67,14 @@ live_merged = pd.merge(teams, live, how='left', left_index=True, right_index=Tru
 live_merged_copy = live_merged.copy()
 live_merged[['total','round','thru']] = live_merged[['total','round','thru']].astype('int')#.rename(columns={'position':'Pos','total':'Total','round':'Round','thru':'Thru'})
 
+team_name = st.sidebar.multiselect(
+    label='Team Filter',
+    options=np.array(live_merged['team'].unique()),
+    default=np.array(live_merged['team'].unique()),
+)
+
+live_merged = live_merged[live_merged['team'].isin(team_name)]
+
 # live_merged = (
 #     live_merged
 # #     .reset_index()
@@ -143,6 +151,7 @@ df_holes_remaining = pd.DataFrame(live_merged.groupby('team')['holes_remaining']
 
 table = pd.merge(thru_cut,df_holes_remaining, left_index=True, right_index=True)
 table = table.merge(team_score, left_index=True, right_index=True).reset_index().rename(columns={'count':'Thru Cut','team':'Team','holes_remaining':'Holes Remaining','total':'Team Score'})
+
 
 st.write("")
 st.header('Arnold Palmer Invitational')
