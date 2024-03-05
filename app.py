@@ -96,7 +96,7 @@ def highlight_rows(row):
     return ['background-color: {}'.format(color) for r in row]
 
 def highlight_rows2(row):
-    value = row.index
+    value = row.index()
     if value == 'unit_circle':
         color = '#FFCCE5' # Pink
     elif value == 'Philly919':
