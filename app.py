@@ -99,9 +99,18 @@ def highlight_rows(row):
 live_merged['holes_remaining'] = (72 - (live_merged['thru']).fillna(0))
 live_merged['holes_remaining'] = np.where(live_merged['position']=='CUT',0,live_merged['holes_remaining']).astype('int')
 
+# team_score = live_merged.groupby('team')[['total']].sum()
+
+# thru_cut = pd.DataFrame(live_merged[live_merged.position !='CUT']['team'].value_counts())
+# df_holes_remaining = pd.DataFrame(live_merged.groupby('team')['holes_remaining'].sum())
+
+# table = pd.merge(thru_cut,df_holes_remaining, left_index=True, right_index=True)
+# table = table.merge(team_score, left_index=True, right_index=True).reset_index().rename(columns={'index':'Team','team':'Thru Cut','holes_remaining':'Holes Remaining','total':'Team Score'})
+
 team_score = live_merged.groupby('team')[['total']].sum()
 
 thru_cut = pd.DataFrame(live_merged[live_merged.position !='CUT']['team'].value_counts())
+
 df_holes_remaining = pd.DataFrame(live_merged.groupby('team')['holes_remaining'].sum())
 
 table = pd.merge(thru_cut,df_holes_remaining, left_index=True, right_index=True)
