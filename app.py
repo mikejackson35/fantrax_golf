@@ -128,7 +128,7 @@ df_holes_remaining = pd.DataFrame(df_holes_remaining).rename(columns={'holes_rem
 
 table = pd.merge(thru_cut,df_holes_remaining, left_index=True, right_index=True)
 table = table.merge(team_score.rename(columns={'Total':'Team Score'}), left_index=True, right_index=True)
-table = table[['Team Score','Holes Remaining','Thru Cut']]
+table = pd.DataFrame(table[['Team Score','Holes Remaining','Thru Cut']])
 
 st.write("")
 st.header('Arnold Palmer Invitational')
