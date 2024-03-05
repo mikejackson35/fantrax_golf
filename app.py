@@ -4,7 +4,7 @@ import plotly.express as px
 import streamlit as st
 
 st.set_page_config(
-    page_title="Pip/Jacko",
+    page_title="fantrax-golf",
     layout="centered",
     initial_sidebar_state="expanded",
 )
