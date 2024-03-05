@@ -171,8 +171,10 @@ df_holes_remaining = df_holes_remaining.T#.set_index('team').T
 
 st.markdown("")
 st.sidebar.caption("Week 9")
-st.sidebar.header('Arnold Palmer Invitational')
-# st.sidebar.markdown(f"<h1>unit_circle<br>{live_merged[live_merged.team=='unit_circle']['total'].sum()}</h1>",unsafe_allow_html=True)
+st.sidebar.header('Arnold Palmer Invitational',divider='grey')
+st.sidebar.markdown("###")
+st.sidebar.markdown("###")
+st.markdown("###")
 st.markdown("###")
 st.markdown('Holes Remaining by Team')
 st.dataframe(df_holes_remaining.style.hide(axis=1).apply(highlight_cols, axis=0),hide_index=True,use_container_width=True)
