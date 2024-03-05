@@ -9,7 +9,6 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-st.write("#")
 st.markdown("""
 <style>
             
@@ -143,14 +142,42 @@ thru_cut = pd.DataFrame(live_merged[live_merged.position !='CUT']['team'].value_
 df_holes_remaining = pd.DataFrame(live_merged.groupby('team')['holes_remaining'].sum())
 
 table = pd.merge(thru_cut,df_holes_remaining, left_index=True, right_index=True)
-table = table.merge(team_score, left_index=True, right_index=True).reset_index().rename(columns={'count':'Thru Cut','team':'Team','holes_remaining':'Holes Remaining','total':'Team Score'})
+table = table.merge(team_score, left_index=True, right_index=True).reset_index().rename(columns={'count':'Thru Cut','team':'Team','holes_remaining':'Holes Remaining','total':'Team Score'}).drop(columns='Holes Remaining')
 
-st.header('Arnold Palmer Invitational')
+
+# table showing holes_remaining
+def highlight_cols(col):
+    if col.team == 'unit_circle':
+        color = '#FFCCE5' # Pink
+    elif col.team == 'Philly919':
+        color = '#7f3c8d' # Purple
+    elif col.team == 'AlphaWired':
+        color = '#3969ac' # Blue
+    elif col.team == 'Sneads Foot':
+        color = '#f2b701' # Gold
+    elif col.team == 'New Team 4':
+        color = '#e73f74' # Magenta
+    elif col.team == 'Team Gamble':
+        color = '#e68310' # Orange
+    elif col.team == 'txmoonshine':
+        color = '#00868b' # Aqua
+    else:
+        color = '#a5aa99' # Grey
+    return ['background-color: {}'.format(color) for c in col]
+
+df_holes_remaining = live_merged.groupby('team',as_index=False)['holes_remaining'].sum()#.sort_values(by='holes_remaining',ascending=False)
+df_holes_remaining = df_holes_remaining.T#.set_index('team').T
+
+st.markdown("")
 st.caption("Week 9")
-st.sidebar.dataframe(table.sort_values(by='Team Score').style.apply(highlight_rows2, axis=1),hide_index=True,use_container_width=True)
+st.header('Arnold Palmer Invitational')
+st.markdown("###")
+st.markdown('Holes Remaining by Team')
+st.dataframe(df_holes_remaining.style.apply(highlight_cols, axis=0),hide_index=True,use_container_width=True)
+st.sidebar.dataframe(table.sort_values(by='Team Score'),hide_index=True,use_container_width=True)#.style.apply(highlight_rows2, axis=1),hide_index=True,use_container_width=True)
 st.markdown("###")
 st.markdown("###")
-st.markdown('LEADERBOARD')
+st.markdown('Leaderboard')
 st.dataframe(live_merged[['player','team','position','total','round','thru']].rename(columns={'player':'Player','team':'Team','position':'Pos','total':'Total','round':'Rnd','thru':'Thru'}).style.apply(highlight_rows, axis=1),hide_index=True,height=1800,use_container_width=True)
 
 
