@@ -95,25 +95,25 @@ def highlight_rows(row):
         color = '#a5aa99' # Grey
     return ['background-color: {}'.format(color) for r in row]
 
-def highlight_rows2(row):
-    value = row.index()
-    if value == 'unit_circle':
-        color = '#FFCCE5' # Pink
-    elif value == 'Philly919':
-        color = '#7f3c8d' # Purple
-    elif value == 'AlphaWired':
-        color = '#3969ac' # Blue
-    elif value == 'Sneads Foot':
-        color = '#f2b701' # Gold
-    elif value == 'New Team 4':
-        color = '#e73f74' # Magenta
-    elif value == 'Team Gamble':
-        color = '#e68310' # Orange
-    elif value == 'txmoonshine':
-        color = '#00868b' # Aqua
-    else:
-        color = '#a5aa99' # Grey
-    return ['background-color: {}'.format(color) for r in row]
+# def highlight_rows2(row):
+#     value = row.index()
+#     if value == 'unit_circle':
+#         color = '#FFCCE5' # Pink
+#     elif value == 'Philly919':
+#         color = '#7f3c8d' # Purple
+#     elif value == 'AlphaWired':
+#         color = '#3969ac' # Blue
+#     elif value == 'Sneads Foot':
+#         color = '#f2b701' # Gold
+#     elif value == 'New Team 4':
+#         color = '#e73f74' # Magenta
+#     elif value == 'Team Gamble':
+#         color = '#e68310' # Orange
+#     elif value == 'txmoonshine':
+#         color = '#00868b' # Aqua
+#     else:
+#         color = '#a5aa99' # Grey
+#     return ['background-color: {}'.format(color) for r in row]
 
 
 live_merged['holes_remaining'] = (72 - (live_merged['thru']).fillna(0))
@@ -134,7 +134,7 @@ thru_cut = pd.DataFrame(live_merged[live_merged.position !='CUT']['team'].value_
 df_holes_remaining = pd.DataFrame(live_merged.groupby('team')['holes_remaining'].sum())
 
 table = pd.merge(thru_cut,df_holes_remaining, left_index=True, right_index=True)
-table = table.merge(team_score, left_index=True, right_index=True).rename(columns={'count':'Thru Cut','team':'Team','holes_remaining':'Holes Remaining','total':'Team Score'}).style.apply(highlight_rows2, axis=1)
+table = table.merge(team_score, left_index=True, right_index=True).rename(columns={'count':'Thru Cut','team':'Team','holes_remaining':'Holes Remaining','total':'Team Score'})#.style.apply(highlight_rows2, axis=1)
 
 st.write("")
 st.header('Arnold Palmer Invitational')
