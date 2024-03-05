@@ -113,7 +113,7 @@ def highlight_rows2(row):
         color = '#00868b' # Aqua
     else:
         color = '#a5aa99' # Grey
-    return ['background-color: {}'.format(color) for r in row]
+    return ['background-color: {}; opacity: 0.5'.format(color) for r in row]
 
 
 live_merged['holes_remaining'] = (72 - (live_merged['thru']).fillna(0))
