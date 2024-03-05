@@ -124,9 +124,10 @@ live_merged['holes_remaining'] = np.where(live_merged['Pos']=='CUT',0,live_merge
 thru_cut = pd.DataFrame(live_merged[live_merged.Pos!='CUT']['Team'].value_counts())
 thru_cut = thru_cut.rename(columns={'Team':'Thru Cut'})
 df_holes_remaining = live_merged.groupby('Team')['holes_remaining'].sum().sort_values()#by='holes_remaining',ascending=False)
-df_holes_remaining = pd.DataFrame(df_holes_remaining).rename(columns={'holes_remaining':'Holes Left'})
+df_holes_remaining = pd.DataFrame(df_holes_remaining).rename(columns={'holes_remaining':'Holes Remaining'})
 table = pd.merge(thru_cut,df_holes_remaining, left_index=True, right_index=True)
 
+st.write("")
 st.header('Arnold Palmer Invitational')
 st.caption("Week 9")
 st.markdown("###")
