@@ -72,7 +72,7 @@ live_merged = pd.merge(teams, live, how='left', left_index=True, right_index=Tru
 live_merged_copy = live_merged.copy()
 live_merged[['total','round','thru']] = live_merged[['total','round','thru']].astype('int')#.rename(columns={'position':'Pos','total':'Total','round':'Round','thru':'Thru'})
 
-
+placeholder = st.empty()
 placeholder1 = st.sidebar.empty()
 placeholder2 = st.sidebar.empty()
 placeholder3 = st.sidebar.empty()
@@ -159,7 +159,7 @@ cut_bar = px.bar(table,
                  log_y=True,
                  title='Players Thru the Cut')
 
-cut_bar.update_layout(showlegend=False,title_x=.25)
+cut_bar.update_layout(showlegend=False)#,title_x=.25)
 cut_bar.update_yaxes(showticklabels=False,showgrid=False)
 cut_bar.update_traces(marker_color='rgb(200,200,200)',marker_line_width=1.5, opacity=0.6)
 # table = table.merge(team_score, left_index=True, right_index=True).reset_index().rename(columns={'count':'Thru Cut','team':'Team','holes_remaining':'Holes Remaining','total':'Team Score'}).drop(columns='Holes Remaining')
@@ -190,8 +190,9 @@ df_holes_remaining = live_merged.groupby('team',as_index=False)[['holes_remainin
 
 live_merged = live_merged[['player','team','position','total','round','thru']].rename(columns={'player':'Player','team':'Team','position':'Pos','total':'Total','round':'Rnd','thru':'Thru'}).style.apply(highlight_rows, axis=1)
 
-placeholder1.subheader("Week 9")
-placeholder2.title('Arnold Palmer Invitational')
+# placeholder.markdown("")
+# placeholder1.subheader("Week 9")
+# placeholder2.title('Arnold Palmer Invitational')
 placeholder3.markdown("###")
 placeholder3.markdown("###")
 placeholder4.markdown('PLAYER HOLES REMAINING')
