@@ -77,8 +77,9 @@ placeholder4 = st.sidebar.empty()
 placeholder5 = st.sidebar.empty()
 
 st.write("#")
+st.subheader('LEADERBOARD')
 team_name = st.multiselect(
-    label='Team Filter',
+    label='',
     options=np.array(live_merged['team'].unique()),
     default=np.array(live_merged['team'].unique()),
 )
@@ -187,7 +188,9 @@ st.sidebar.plotly_chart(cut_bar, use_container_width=True,config = config)
 with st.expander('EXPAND Live Strokes Gained'):
     st.dataframe(live_sg,height=1000,hide_index=True,use_container_width=True)
 
-st.subheader('LEADERBOARD')
+st.write("###")
+st.write("###")
+st.write("###")
 st.dataframe(live_merged,hide_index=True,height=1000,use_container_width=True, column_config={"Team": None})
 
 
