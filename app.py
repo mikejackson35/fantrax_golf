@@ -14,7 +14,7 @@ st.set_page_config(
 alt.themes.enable("dark")
 
 # css_file = current_dir / "styles" / "main.css"
-with open(r"styles\main.css") as f:
+with open(r"styles/main.css") as f:
     st.markdown("<style>{}</style>".format(f.read()), unsafe_allow_html=True)
 
 config = {'displayModeBar': False}
