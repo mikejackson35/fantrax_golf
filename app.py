@@ -68,12 +68,17 @@ live_merged = pd.merge(teams, live, how='left', left_index=True, right_index=Tru
 live_merged_copy = live_merged.copy()
 live_merged[['total','round','thru']] = live_merged[['total','round','thru']].astype('int')#.rename(columns={'position':'Pos','total':'Total','round':'Round','thru':'Thru'})
 
+live_sg = live_merged[['sg_putt','sg_arg','sg_app','sg_ott','sg_t2g','sg_bs','sg_total']].reset_index()
+live_sg = live_sg.style.background_gradient(cmap='Greens').format(precision=1)
+
+
 placeholder1 = st.sidebar.empty()
 placeholder2 = st.sidebar.empty()
 placeholder3 = st.sidebar.empty()
 placeholder4 = st.sidebar.empty()
 placeholder5 = st.sidebar.empty()
 
+st.write("#")
 team_name = st.multiselect(
     label='Team Filter',
     options=np.array(live_merged['team'].unique()),
@@ -81,14 +86,6 @@ team_name = st.multiselect(
 )
 
 live_merged = live_merged[live_merged['team'].isin(team_name)]
-
-# live_merged = (
-#     live_merged
-# #     .reset_index()
-#     .rename(columns={
-#         'player':'Player','team':'Team','position':'Pos','total':'Total','round':'Round','thru':'Thru Cut'}
-#            )
-# )
 
 def highlight_rows(row):
     value = row.loc['Team']
@@ -155,6 +152,7 @@ cut_bar = px.bar(table,
 
 cut_bar.update_layout(showlegend=False,title_x=.25)
 cut_bar.update_yaxes(showticklabels=False,showgrid=False)
+cut_bar.update_traces(marker_color='rgb(200,200,200)',marker_line_width=1.5, opacity=0.6)
 # table = table.merge(team_score, left_index=True, right_index=True).reset_index().rename(columns={'count':'Thru Cut','team':'Team','holes_remaining':'Holes Remaining','total':'Team Score'}).drop(columns='Holes Remaining')
 
 
@@ -187,7 +185,7 @@ placeholder1.subheader("Week 9")
 placeholder2.title('Arnold Palmer Invitational')
 placeholder3.markdown("###")
 placeholder3.markdown("###")
-placeholder4.markdown(':golf: HOLES REMAINING')
+placeholder4.markdown('HOLES REMAINING / TEAM SCORE')
 placeholder5.dataframe(df_holes_remaining.sort_values(by='To Par').style.apply(highlight_cols, axis=1),hide_index=True,use_container_width=True)
 # st.markdown("###")
 # st.markdown("###")
@@ -196,6 +194,9 @@ placeholder5.dataframe(df_holes_remaining.sort_values(by='To Par').style.apply(h
 # st.dataframe(table,hide_index=True,use_container_width=True)
 st.sidebar.plotly_chart(cut_bar, use_container_width=True)
 st.markdown("###")
+with st.expander('Show Live Strokes Gained Stats'):
+    st.dataframe(live_sg,height=1000,hide_index=True,use_container_width=True)
+
 st.markdown("###")
 st.subheader('LEADERBOARD')
 st.dataframe(live_merged,hide_index=True,height=1800,use_container_width=True)
