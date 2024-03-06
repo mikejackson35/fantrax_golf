@@ -79,6 +79,7 @@ placeholder3 = st.sidebar.empty()
 placeholder4 = st.sidebar.empty()
 placeholder5 = st.sidebar.empty()
 
+holder_week = st.empty()
 header_holder = st.empty()
 holder_expander = st.empty()
 holder_leaderboard = st.empty()
@@ -202,12 +203,12 @@ placeholder5.dataframe(df_holes_remaining.sort_values(by='To Par').style.apply(h
 # st.dataframe(table,hide_index=True,use_container_width=True)
 st.sidebar.plotly_chart(cut_bar, use_container_width=True,config = config)
 
-st.markdown("")
 with holder_expander.expander('EXPAND Live Strokes Gained'):
     st.dataframe(live_sg,height=1000,hide_index=True,use_container_width=True)
 
-header_holder.subheader('LEADERBOARD')
-holder_leaderboard.dataframe(live_merged,hide_index=True,height=1200,use_container_width=True)
+holder_week.markdown("week 9")
+header_holder.subheader('LEADERBOARD - Arnold Palmer Invitational')
+holder_leaderboard.dataframe(live_merged,hide_index=True,height=1000,use_container_width=True)
 
 
 
