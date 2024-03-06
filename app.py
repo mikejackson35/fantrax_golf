@@ -74,7 +74,7 @@ placeholder3 = st.sidebar.empty()
 placeholder4 = st.sidebar.empty()
 placeholder5 = st.sidebar.empty()
 
-team_name = st.sidebar.multiselect(
+team_name = st.multiselect(
     label='Team Filter',
     options=np.array(live_merged['team'].unique()),
     default=np.array(live_merged['team'].unique()),
@@ -142,14 +142,20 @@ def highlight_rows2(row):
 live_merged['holes_remaining'] = (72 - (live_merged['thru']).fillna(0))
 live_merged['holes_remaining'] = np.where(live_merged['position']=='CUT',0,live_merged['holes_remaining']).astype('int')
 
-team_score = live_merged.groupby('team')[['total']].sum()
+# team_score = live_merged.groupby('team')[['total']].sum()
 
-thru_cut = pd.DataFrame(live_merged[live_merged.position !='CUT']['team'].value_counts())
+table = pd.DataFrame(live_merged[live_merged.position !='CUT']['team'].value_counts())
+cut_bar = px.bar(table,
+                 template='presentation',
+                 labels={'value':'','index':''},
+                 text_auto=True,
+                 height=250,
+                 log_y=True,
+                 title='Players Thru the Cut')
 
-df_holes_remaining = pd.DataFrame(live_merged.groupby('team')['holes_remaining'].sum())
-
-table = pd.merge(thru_cut,df_holes_remaining, left_index=True, right_index=True)
-table = table.merge(team_score, left_index=True, right_index=True).reset_index().rename(columns={'count':'Thru Cut','team':'Team','holes_remaining':'Holes Remaining','total':'Team Score'}).drop(columns='Holes Remaining')
+cut_bar.update_layout(showlegend=False,title_x=.25)
+cut_bar.update_yaxes(showticklabels=False,showgrid=False)
+# table = table.merge(team_score, left_index=True, right_index=True).reset_index().rename(columns={'count':'Thru Cut','team':'Team','holes_remaining':'Holes Remaining','total':'Team Score'}).drop(columns='Holes Remaining')
 
 
 # table showing holes_remaining
@@ -173,7 +179,7 @@ def highlight_cols(col):
         color = '#a5aa99' # Grey
     return ['background-color: {}'.format(color) for c in col]
 
-df_holes_remaining = live_merged.groupby('team',as_index=False)[['holes_remaining','total']].sum().rename(columns={'holes_remaining':'Holes Remaining','total':'Team Score'})
+df_holes_remaining = live_merged.groupby('team',as_index=False)[['holes_remaining','total']].sum().rename(columns={'holes_remaining':'PHR','total':'To Par'})
 
 live_merged = live_merged[['player','team','position','total','round','thru']].rename(columns={'player':'Player','team':'Team','position':'Pos','total':'Total','round':'Rnd','thru':'Thru'}).style.apply(highlight_rows, axis=1)
 
@@ -182,12 +188,13 @@ placeholder2.title('Arnold Palmer Invitational')
 placeholder3.markdown("###")
 placeholder3.markdown("###")
 placeholder4.markdown(':golf: HOLES REMAINING')
-placeholder5.dataframe(df_holes_remaining.style.hide(axis=1).apply(highlight_cols, axis=1),hide_index=True)
-st.markdown("###")
-st.markdown("###")
-st.subheader('HOLES REMAINING')
+placeholder5.dataframe(df_holes_remaining.sort_values(by='To Par').style.apply(highlight_cols, axis=1),hide_index=True,use_container_width=True)
+# st.markdown("###")
+# st.markdown("###")
+# st.markdown('PLAYERS THRU THE CUT')
 # st.dataframe(df_holes_remaining.style.hide(axis=1).apply(highlight_cols, axis=1),hide_index=True,use_container_width=True)
-st.dataframe(table.sort_values(by='Team Score'),hide_index=True,use_container_width=True)
+# st.dataframe(table,hide_index=True,use_container_width=True)
+st.sidebar.plotly_chart(cut_bar, use_container_width=True)
 st.markdown("###")
 st.markdown("###")
 st.subheader('LEADERBOARD')
