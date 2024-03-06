@@ -2,13 +2,15 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import streamlit as st
-import streamlit.components.v1 as components
+import altair as alt
 
 st.set_page_config(
     page_title="fantrax-golf",
     layout="centered",
     initial_sidebar_state="expanded",
 )
+
+alt.themes.enable("dark")
 
 config = {'displayModeBar': False}
 
@@ -76,6 +78,10 @@ placeholder2 = st.sidebar.empty()
 placeholder3 = st.sidebar.empty()
 placeholder4 = st.sidebar.empty()
 placeholder5 = st.sidebar.empty()
+
+header_holder = st.empty()
+holder_expander = st.empty()
+holder_leaderboard = st.empty()
 
 st.write("#")
 team_name = st.multiselect(
@@ -195,13 +201,13 @@ placeholder5.dataframe(df_holes_remaining.sort_values(by='To Par').style.apply(h
 # st.dataframe(df_holes_remaining.style.hide(axis=1).apply(highlight_cols, axis=1),hide_index=True,use_container_width=True)
 # st.dataframe(table,hide_index=True,use_container_width=True)
 st.sidebar.plotly_chart(cut_bar, use_container_width=True,config = config)
-st.markdown("###")
-with st.expander('Show Live Strokes Gained Stats'):
+
+st.markdown("")
+with holder_expander.expander('EXPAND Live Strokes Gained'):
     st.dataframe(live_sg,height=1000,hide_index=True,use_container_width=True)
 
-st.markdown("###")
-st.subheader('LEADERBOARD')
-st.dataframe(live_merged,hide_index=True,height=1800,use_container_width=True)
+header_holder.subheader('LEADERBOARD')
+holder_leaderboard.dataframe(live_merged,hide_index=True,height=1200,use_container_width=True)
 
 
 
