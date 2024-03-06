@@ -3,7 +3,7 @@ import numpy as np
 import plotly.express as px
 import streamlit as st
 import altair as alt
-from utils import get_active_rosters, highlight_rows, highlight_cols
+from utils import highlight_rows
 
 st.set_page_config(
     page_title="fantrax-golf",
@@ -12,11 +12,9 @@ st.set_page_config(
 )
 alt.themes.enable("dark")
 
-# CSS
+# CSS and PLOTLY CONFIGS
 with open(r"styles/main.css") as f:
     st.markdown("<style>{}</style>".format(f.read()), unsafe_allow_html=True)
-
-# removes menu from plotly charts
 config = {'displayModeBar': False}
 
 # GET LIVE GOLF DATA
@@ -25,9 +23,9 @@ def get_projections():
     live = pd.read_csv(r"https://feeds.datagolf.com/preds/live-tournament-stats?stats=sg_putt,sg_arg,sg_app,sg_ott,sg_t2g,sg_bs,sg_total,distance,accuracy,gir,prox_fw,prox_rgh,scrambling&round=event_avg&display=value&file_format=csv&key=e297e933c3ad47d71ec1626c299e")#,usecols=['dk_name','total_points'])
     return live
 live = get_projections()
-dg_proj_copy = live.copy()
 live.rename(columns={'player_name':'player'},inplace=True)
 
+# prep live
 names = live['player'].str.split(expand=True)
 names[0] = names[0].str.rstrip(",")
 names[1] = names[1].str.rstrip(",")
@@ -37,33 +35,31 @@ names['player'] = np.where(names['player']=='Byeong An', 'Byeong Hun An', names[
 names['player'] = np.where(names['player']=='Rooyen Van', 'Erik Van Rooyen', names['player'])
 live = live.set_index(names.player)
 
-# GET FANTRAX ACTIVE ROSTERS
+### GET FANTRAX ACTIVE ROSTERS ###
 st.cache_data()
 def get_fantrax():
     teams = pd.read_csv(r"fx_wk9.csv",usecols=['Player','Status','Roster Status'])
     return teams
 teams = get_fantrax()
 
+# prep fantrax
 teams.columns = ['player','team','active_reserve']
 teams_dict = {'919':'Philly919','u_c':'unit_circle','NT 4':'New Team 4','NT 8':'Sneads Foot','txms':'txmoonshine','MG':'Team Gamble','grrr':'Putt Pirates','[AW]':'AlphaWired'}
 teams['team'] = teams.team.map(teams_dict)
 teams = teams.loc[teams.active_reserve=='Active'].set_index('player')
 
-# MERGE ACTIVE ROSTERS WITH LIVE SCORING
+### MERGE ACTIVE ROSTERS WITH LIVE SCORING ###
 live_merged = pd.merge(teams, live, how='left', left_index=True, right_index=True).fillna(0).sort_values('total')
 live_merged['holes_remaining'] = (72 - (live_merged['thru']).fillna(0))
 live_merged['holes_remaining'] = np.where(live_merged['position']=='CUT',0,live_merged['holes_remaining']).astype('int')
 
-st.write("###")
+### TEAM FILTER CHARTS ###
 team_name = st.multiselect(
     label='',
     options=np.array(live_merged['team'].unique()),
     default=np.array(live_merged['team'].unique()))
 st.write("###")
 st.write("###")
-
-
-## MAKE CHARTS ##
 
 # 1 live leaderboard
 live_leaderboard = live_merged[['player','team','position','total','round','thru']].fillna(0).sort_values('total')
@@ -108,14 +104,13 @@ team_score_bar.update_traces(marker_color='rgb(200,200,200)',marker_line_width=1
 live_sg = live_merged[live_merged.team.isin(team_name)][['player','sg_putt','sg_t2g','sg_total','gir']].reset_index(drop=True)
 live_sg = live_sg.style.background_gradient(cmap='Greens').format(precision=2)
 
-# MAIN PAGE
+### MAIN PAGE ###
 st.markdown("<h3 style='text-align: center;;'>Live Leaderboard </h3>", unsafe_allow_html=True)
-
-# SIDEBAR
 with st.expander('EXPAND for Live Strokes Gained'):
     st.dataframe(live_sg,height=1000,hide_index=True,use_container_width=True)
 st.dataframe(live_leaderboard,hide_index=True,height=1600,use_container_width=True, column_config={"Team": None})
 
+### SIDEBAR ###
 st.sidebar.markdown("<h4 style='text-align: center;;'>Arnold Palmer<br>Invitational </h4>", unsafe_allow_html=True)
 st.sidebar.markdown("---")
 st.sidebar.dataframe(live_phr,hide_index=True,use_container_width=True)
