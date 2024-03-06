@@ -54,13 +54,14 @@ live_merged = pd.merge(teams, live, how='left', left_index=True, right_index=Tru
 live_merged['holes_remaining'] = (72 - (live_merged['thru']).fillna(0))
 live_merged['holes_remaining'] = np.where(live_merged['position']=='CUT',0,live_merged['holes_remaining']).astype('int')
 
+st.write("###")
 team_name = st.multiselect(
     label='',
     options=np.array(live_merged['team'].unique()),
     default=np.array(live_merged['team'].unique()))
 st.write("###")
 st.write("###")
-st.write("###")
+
 
 ## MAKE CHARTS ##
 
@@ -117,9 +118,9 @@ st.dataframe(live_leaderboard,hide_index=True,height=1600,use_container_width=Tr
 
 st.sidebar.markdown("<h4 style='text-align: center;;'>Arnold Palmer<br>Invitational </h4>", unsafe_allow_html=True)
 st.sidebar.markdown("---")
-st.sidebar.plotly_chart(team_score_bar, use_container_width=True,config = config)
 st.sidebar.dataframe(live_phr,hide_index=True,use_container_width=True)
-st.sidebar.plotly_chart(thru_cut_bar, use_container_width=True,config = config)
+st.sidebar.plotly_chart(team_score_bar, use_container_width=True,config = config)
+# st.sidebar.plotly_chart(thru_cut_bar, use_container_width=True,config = config)
 
 
     
