@@ -154,7 +154,7 @@ table = table.merge(team_score, left_index=True, right_index=True).reset_index()
 
 # table showing holes_remaining
 def highlight_cols(col):
-    # value = col.
+
     if col.team == 'unit_circle':
         color = '#FFCCE5' # Pink
     elif col.team == 'Philly919':
@@ -174,7 +174,7 @@ def highlight_cols(col):
     return ['background-color: {}'.format(color) for c in col]
 
 df_holes_remaining = live_merged.groupby('team',as_index=False)['holes_remaining'].sum()#.sort_values(by='holes_remaining',ascending=False)
-df_holes_remaining = df_holes_remaining.T#.set_index('team').T
+# df_holes_remaining = df_holes_remaining.T#.set_index('team').T
 
 live_merged = live_merged[['player','team','position','total','round','thru']].rename(columns={'player':'Player','team':'Team','position':'Pos','total':'Total','round':'Rnd','thru':'Thru'}).style.apply(highlight_rows, axis=1)
 
@@ -182,11 +182,13 @@ placeholder1.caption("Week 9")
 placeholder2.title('Arnold Palmer Invitational')
 placeholder3.markdown("###")
 placeholder4.markdown("###")
-placeholder5.dataframe(table.sort_values(by='Team Score'),hide_index=True,use_container_width=True)
+placeholder5.dataframe(df_holes_remaining.style.hide(axis=1).apply(highlight_cols, axis=1),hide_index=True)#,use_container_width=True)
+# placeholder5.dataframe(table.sort_values(by='Team Score'),hide_index=True,use_container_width=True)
 st.markdown("###")
 st.markdown("###")
 st.subheader('HOLES REMAINING')
-st.dataframe(df_holes_remaining.style.hide(axis=1).apply(highlight_cols, axis=0),hide_index=True,use_container_width=True)
+# st.dataframe(df_holes_remaining.style.hide(axis=1).apply(highlight_cols, axis=1),hide_index=True,use_container_width=True)
+st.dataframe(table.sort_values(by='Team Score'),hide_index=True,use_container_width=True)
 st.markdown("###")
 st.markdown("###")
 st.subheader('LEADERBOARD')
