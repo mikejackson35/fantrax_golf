@@ -67,7 +67,13 @@ live_merged = pd.merge(teams, live, how='left', left_index=True, right_index=Tru
 live_merged_copy = live_merged.copy()
 live_merged[['total','round','thru']] = live_merged[['total','round','thru']].astype('int')#.rename(columns={'position':'Pos','total':'Total','round':'Round','thru':'Thru'})
 
-team_name = st.multiselect(
+placeholder1 = st.sidebar.empty()
+placeholder2 = st.sidebar.empty()
+placeholder3 = st.sidebar.empty()
+placeholder4 = st.sidebar.empty()
+placeholder5 = st.sidebar.empty()
+
+team_name = st.sidebar.multiselect(
     label='Team Filter',
     options=np.array(live_merged['team'].unique()),
     default=np.array(live_merged['team'].unique()),
@@ -169,20 +175,21 @@ def highlight_cols(col):
 df_holes_remaining = live_merged.groupby('team',as_index=False)['holes_remaining'].sum()#.sort_values(by='holes_remaining',ascending=False)
 df_holes_remaining = df_holes_remaining.T#.set_index('team').T
 
-st.markdown("")
-st.sidebar.caption("Week 9")
-st.sidebar.title('Arnold Palmer Invitational')
-st.sidebar.markdown("###")
-st.sidebar.markdown("###")
+live_merged = live_merged[['player','team','position','total','round','thru']].rename(columns={'player':'Player','team':'Team','position':'Pos','total':'Total','round':'Rnd','thru':'Thru'}).style.apply(highlight_rows, axis=1)
+
+placeholder1.caption("Week 9")
+placeholder2.title('Arnold Palmer Invitational')
+placeholder3.markdown("###")
+placeholder4.markdown("###")
+placeholder5.dataframe(table.sort_values(by='Team Score'),hide_index=True,use_container_width=True)
 st.markdown("###")
 st.markdown("###")
 st.markdown('Holes Remaining by Team')
 st.dataframe(df_holes_remaining.style.hide(axis=1).apply(highlight_cols, axis=0),hide_index=True,use_container_width=True)
-st.sidebar.dataframe(table.sort_values(by='Team Score'),hide_index=True,use_container_width=True)#.style.apply(highlight_rows2, axis=1),hide_index=True,use_container_width=True)
 st.markdown("###")
 st.markdown("###")
 st.markdown('Leaderboard')
-st.dataframe(live_merged[['player','team','position','total','round','thru']].rename(columns={'player':'Player','team':'Team','position':'Pos','total':'Total','round':'Rnd','thru':'Thru'}).style.apply(highlight_rows, axis=1),hide_index=True,height=1800,use_container_width=True)
+st.dataframe(live_merged,hide_index=True,height=1800,use_container_width=True)
 
 
 
