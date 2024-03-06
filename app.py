@@ -173,17 +173,16 @@ def highlight_cols(col):
         color = '#a5aa99' # Grey
     return ['background-color: {}'.format(color) for c in col]
 
-df_holes_remaining = live_merged.groupby('team',as_index=False)['holes_remaining'].sum()#.sort_values(by='holes_remaining',ascending=False)
-# df_holes_remaining = df_holes_remaining.T#.set_index('team').T
+df_holes_remaining = live_merged.groupby('team',as_index=False)[['holes_remaining','total']].sum().rename(columns={'holes_remaining':'Holes Remaining','total':'Team Score'})
 
 live_merged = live_merged[['player','team','position','total','round','thru']].rename(columns={'player':'Player','team':'Team','position':'Pos','total':'Total','round':'Rnd','thru':'Thru'}).style.apply(highlight_rows, axis=1)
 
-placeholder1.caption("Week 9")
+placeholder1.subheader("Week 9")
 placeholder2.title('Arnold Palmer Invitational')
 placeholder3.markdown("###")
-placeholder4.markdown("###")
-placeholder5.dataframe(df_holes_remaining.style.hide(axis=1).apply(highlight_cols, axis=1),hide_index=True)#,use_container_width=True)
-# placeholder5.dataframe(table.sort_values(by='Team Score'),hide_index=True,use_container_width=True)
+placeholder3.markdown("###")
+placeholder4.markdown(':golf: HOLES REMAINING')
+placeholder5.dataframe(df_holes_remaining.style.hide(axis=1).apply(highlight_cols, axis=1),hide_index=True)
 st.markdown("###")
 st.markdown("###")
 st.subheader('HOLES REMAINING')
