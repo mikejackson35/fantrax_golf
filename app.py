@@ -190,7 +190,7 @@ st.dataframe(df_holes_remaining.style.hide(axis=1).apply(highlight_cols, axis=0)
 st.markdown("###")
 st.markdown("###")
 st.subheader('LEADERBOARD')
-st.dataframe(live_merged,hide_index=True,height=1800,use_container_width=True)
+st.dataframe(live_merged,hide_index=True,height=1800)#,use_container_width=True)
 
 
 
