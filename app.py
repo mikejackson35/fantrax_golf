@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import streamlit as st
+import streamlit.components.v1 as components
 
 st.set_page_config(
     page_title="fantrax-golf",
@@ -184,11 +185,11 @@ placeholder4.markdown("###")
 placeholder5.dataframe(table.sort_values(by='Team Score'),hide_index=True,use_container_width=True)
 st.markdown("###")
 st.markdown("###")
-st.markdown('Holes Remaining by Team')
+st.subheader('HOLES REMAINING')
 st.dataframe(df_holes_remaining.style.hide(axis=1).apply(highlight_cols, axis=0),hide_index=True)#,use_container_width=True)
 st.markdown("###")
 st.markdown("###")
-st.markdown('Leaderboard')
+st.subheader('LEADERBOARD')
 st.dataframe(live_merged,hide_index=True,height=1800,use_container_width=True)
 
 
