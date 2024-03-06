@@ -197,18 +197,13 @@ placeholder3.markdown("###")
 placeholder3.markdown("###")
 placeholder4.markdown('PLAYER HOLES REMAINING')
 placeholder5.dataframe(df_holes_remaining.sort_values(by='To Par').style.apply(highlight_cols, axis=1),hide_index=True,use_container_width=True)
-# st.markdown("###")
-# st.markdown("###")
-# st.markdown('PLAYERS THRU THE CUT')
-# st.dataframe(df_holes_remaining.style.hide(axis=1).apply(highlight_cols, axis=1),hide_index=True,use_container_width=True)
-# st.dataframe(table,hide_index=True,use_container_width=True)
 st.sidebar.plotly_chart(cut_bar, use_container_width=True,config = config)
 
 with holder_expander.expander('EXPAND Live Strokes Gained'):
     st.dataframe(live_sg,height=1000,hide_index=True,use_container_width=True)
 
 holder_week.markdown("week 9")
-header_holder.subheader('LEADERBOARD - Arnold Palmer Invitational')
+header_holder.subheader('LEADERBOARD')
 holder_leaderboard.dataframe(live_merged,hide_index=True,height=1000,use_container_width=True)
 
 
