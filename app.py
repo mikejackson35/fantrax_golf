@@ -54,24 +54,32 @@ live_merged = pd.merge(teams, live, how='left', left_index=True, right_index=Tru
 live_merged['holes_remaining'] = (72 - (live_merged['thru']).fillna(0))
 live_merged['holes_remaining'] = np.where(live_merged['position']=='CUT',0,live_merged['holes_remaining']).astype('int')
 
+team_name = st.multiselect(
+    label='',
+    options=np.array(live_merged['team'].unique()),
+    default=np.array(live_merged['team'].unique()))
+st.write("###")
+st.write("###")
+st.write("###")
+
 ## MAKE CHARTS ##
 
 # 1 live leaderboard
 live_leaderboard = live_merged[['player','team','position','total','round','thru']].fillna(0).sort_values('total')
 live_leaderboard[['total','round','thru']] = live_leaderboard[['total','round','thru']].astype('int')
 live_board = live_leaderboard.copy()
-live_leaderboard = (live_leaderboard
+live_leaderboard = (live_leaderboard[live_leaderboard.team.isin(team_name)]
                     .rename(columns={'player':'Player','team':'Team','position':'Pos','total':'Total','round':'Round','thru':'Thru'})
                     .style.apply(highlight_rows, axis=1))
 
 # 2 PHR
-live_phr = live_merged.groupby('team')[['holes_remaining']].sum().reset_index().rename(columns={'team':'Team','holes_remaining':'PHR'})
+live_phr = live_merged[live_merged.team.isin(team_name)].groupby('team')[['holes_remaining']].sum().reset_index().rename(columns={'team':'Team','holes_remaining':'PHR'})
 live_phr = (live_phr
             .sort_values(by='PHR')
             .style.apply(highlight_rows, axis=1))
 
 # 3 thru-cut bar
-thru_cut_df = live_board[live_board.position!='CUT']['team'].value_counts()
+thru_cut_df = live_board[(live_board.position!='CUT') & (live_board.team.isin(team_name))]['team'].value_counts()
 thru_cut_bar = px.bar(thru_cut_df,
                  template='presentation',
                  labels={'value':'','index':''},
@@ -84,7 +92,7 @@ thru_cut_bar.update_yaxes(showticklabels=False,showgrid=False)
 thru_cut_bar.update_traces(marker_color='rgb(200,200,200)',marker_line_width=1.5, opacity=0.6)
 
 # 4 team score bar
-team_score_df = live_board.groupby('team')['total'].sum().sort_values()
+team_score_df = live_board[live_board.team.isin(team_name)].groupby('team')['total'].sum().sort_values()
 team_score_bar = px.bar(team_score_df,
                      template='presentation',
                      labels={'value':'','team':''},
@@ -96,18 +104,10 @@ team_score_bar.update_yaxes(showticklabels=False,showgrid=False)
 team_score_bar.update_traces(marker_color='rgb(200,200,200)',marker_line_width=1.5, opacity=0.6)
 
 # 5 live sg
-live_sg = live_merged[['player','sg_putt','sg_t2g','sg_total','gir']].reset_index(drop=True)
+live_sg = live_merged[live_merged.team.isin(team_name)][['player','sg_putt','sg_t2g','sg_total','gir']].reset_index(drop=True)
 live_sg = live_sg.style.background_gradient(cmap='Greens').format(precision=2)
 
 # MAIN PAGE
-st.write("#")
-team_name = st.multiselect(
-    label='',
-    options=np.array(live_merged['team'].unique()),
-    default=np.array(live_merged['team'].unique()))
-st.write("###")
-st.write("###")
-st.write("###")
 st.markdown("<h3 style='text-align: center;;'>Live Leaderboard </h3>", unsafe_allow_html=True)
 
 # SIDEBAR
@@ -119,7 +119,7 @@ st.sidebar.markdown("<h4 style='text-align: center;;'>Arnold Palmer<br>Invitatio
 st.sidebar.markdown("---")
 st.sidebar.plotly_chart(team_score_bar, use_container_width=True,config = config)
 st.sidebar.dataframe(live_phr,hide_index=True,use_container_width=True)
-# st.sidebar.plotly_chart(thru_cut_bar, use_container_width=True,config = config)
+st.sidebar.plotly_chart(thru_cut_bar, use_container_width=True,config = config)
 
 
     
