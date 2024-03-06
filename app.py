@@ -3,6 +3,7 @@ import numpy as np
 import plotly.express as px
 import streamlit as st
 import altair as alt
+from utils import get_active_rosters, highlight_rows, highlight_cols
 
 st.set_page_config(
     page_title="fantrax-golf",
@@ -77,7 +78,7 @@ placeholder4 = st.sidebar.empty()
 placeholder5 = st.sidebar.empty()
 
 st.write("#")
-st.markdown("<h3 style='text-align: center;;'>Live Leaderboard </h3>", unsafe_allow_html=True)
+# st.markdown("<h3 style='text-align: center;;'>Live Leaderboard </h3>", unsafe_allow_html=True)
 # st.subheader('LEADERBOARD')
 
 
@@ -87,58 +88,63 @@ team_name = st.multiselect(
     default=np.array(live_merged['team'].unique()),
 )
 
+st.write("###")
+st.write("###")
+st.write("###")
+st.markdown("<h3 style='text-align: center;;'>Live Leaderboard </h3>", unsafe_allow_html=True)
+
 live_merged = live_merged[live_merged['team'].isin(team_name)]
 
-live_sg = live_merged[['sg_putt','sg_t2g','sg_total']].reset_index()
-live_sg = live_sg.style.background_gradient(cmap='Greens').format(precision=1)
+live_sg = live_merged[['sg_putt','sg_t2g','sg_total','gir']].reset_index()
+live_sg = live_sg.style.background_gradient(cmap='Greens').format(precision=2)
 
-def highlight_rows(row):
-    value = row.loc['Team']
-    if value == 'unit_circle':
-        color = '#FF99FF' # Pink
-    elif value == 'Philly919':
-        color = '#7f3c8d' # Purple
-    elif value == 'AlphaWired':
-        color = '#3969ac' # Blue
-    elif value == 'Sneads Foot':
-        color = '#f2b701' # Gold
-    elif value == 'New Team 4':
-        color = '#FF6666' # Magenta
-    elif value == 'Team Gamble':
-        color = '#e68310' # Orange
-    elif value == 'txmoonshine':
-        color = '#00868b' # Aqua
-    else:
-        color = '#a5aa99' # Grey
-    return ['background-color: {}'.format(color) for r in row]
+# def highlight_rows(row):
+#     value = row.loc['Team']
+#     if value == 'unit_circle':
+#         color = '#FF99FF' # Pink
+#     elif value == 'Philly919':
+#         color = '#7f3c8d' # Purple
+#     elif value == 'AlphaWired':
+#         color = '#3969ac' # Blue
+#     elif value == 'Sneads Foot':
+#         color = '#f2b701' # Gold
+#     elif value == 'New Team 4':
+#         color = '#FF6666' # Magenta
+#     elif value == 'Team Gamble':
+#         color = '#e68310' # Orange
+#     elif value == 'txmoonshine':
+#         color = '#00868b' # Aqua
+#     else:
+#         color = '#a5aa99' # Grey
+#     return ['background-color: {}'.format(color) for r in row]
 
-def highlight_rows2(row):
-    value = row.loc['Team']
-    if value == 'unit_circle':
-        color = '#FF99FF' # Pink
-        opacity = 0.25
-    elif value == 'Philly919':
-        color = '#7f3c8d' # Purple
-        opacity = 0.25
-    elif value == 'AlphaWired':
-        color = '#3969ac' # Blue
-        opacity = 0.25
-    elif value == 'Sneads Foot':
-        color = '#f2b701' # Gold
-        opacity = 0.25
-    elif value == 'New Team 4':
-        color = '#FF6666' # Magenta
-        opacity = 0.25
-    elif value == 'Team Gamble':
-        color = '#e68310' # Orange
-        opacity = 0.25
-    elif value == 'txmoonshine':
-        color = '#00868b' # Aqua
-        opacity = 0.25
-    else:
-        color = '#a5aa99' # Grey
-        opacity = 0.25
-    return ['background-color: {}; opacity: {}'.format(color,opacity) for r in row]
+# def highlight_rows2(row):
+#     value = row.loc['Team']
+#     if value == 'unit_circle':
+#         color = '#FF99FF' # Pink
+#         opacity = 0.25
+#     elif value == 'Philly919':
+#         color = '#7f3c8d' # Purple
+#         opacity = 0.25
+#     elif value == 'AlphaWired':
+#         color = '#3969ac' # Blue
+#         opacity = 0.25
+#     elif value == 'Sneads Foot':
+#         color = '#f2b701' # Gold
+#         opacity = 0.25
+#     elif value == 'New Team 4':
+#         color = '#FF6666' # Magenta
+#         opacity = 0.25
+#     elif value == 'Team Gamble':
+#         color = '#e68310' # Orange
+#         opacity = 0.25
+#     elif value == 'txmoonshine':
+#         color = '#00868b' # Aqua
+#         opacity = 0.25
+#     else:
+#         color = '#a5aa99' # Grey
+#         opacity = 0.25
+#     return ['background-color: {}; opacity: {}'.format(color,opacity) for r in row]
 
 
 live_merged['holes_remaining'] = (72 - (live_merged['thru']).fillna(0))
@@ -157,7 +163,7 @@ cut_bar.update_layout(showlegend=False,title_x=.25)
 cut_bar.update_yaxes(showticklabels=False,showgrid=False)
 cut_bar.update_traces(marker_color='rgb(200,200,200)',marker_line_width=1.5, opacity=0.6)
 
-# table showing holes_remaining
+# # table showing holes_remaining
 def highlight_cols(col):
 
     if col.team == 'unit_circle':
@@ -180,7 +186,9 @@ def highlight_cols(col):
 
 df_holes_remaining = live_merged.groupby('team',as_index=False)[['total','holes_remaining']].sum().rename(columns={'holes_remaining':'PHR','total':'To Par'})
 
-live_merged = live_merged[['player','team','position','total','round','thru']].rename(columns={'player':'Player','team':'Team','position':'Pos','total':'Total','round':'Rnd','thru':'Thru'}).style.apply(highlight_rows, axis=1)
+live_merged = (live_merged[['player','team','position','total','round','thru']]
+               .rename(columns={'player':'Player','team':'Team','position':'Pos','total':'Total','round':'Rnd','thru':'Thru'})
+               .style.apply(highlight_rows, axis=1))
 
 placeholder3.markdown("<h2 style='text-align: center;;'>Arnold Palmer<br>Invitational </h2>", unsafe_allow_html=True)
 placeholder4.markdown("###")
@@ -188,9 +196,6 @@ placeholder5.dataframe(df_holes_remaining.sort_values(by='To Par').style.apply(h
 
 st.sidebar.plotly_chart(cut_bar, use_container_width=True,config = config)
 
-st.write("###")
-st.write("###")
-st.write("###")
 with st.expander('EXPAND for Live Strokes Gained'):
     st.dataframe(live_sg,height=1000,hide_index=True,use_container_width=True)
 st.dataframe(live_merged,hide_index=True,height=1600,use_container_width=True, column_config={"Team": None})

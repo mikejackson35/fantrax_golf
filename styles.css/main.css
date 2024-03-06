@@ -1,0 +1,18 @@
+[data-baseweb="tab-list"] {
+    gap: 4px;
+}
+
+[data-baseweb="tab"] {
+    height: 30px;
+    width: 500px;
+    white-space: pre-wrap;
+    background-color: #A29F99;
+    border-radius: 4px 4px 0px 0px;
+    gap: 1px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+header {visibility: hidden;}
