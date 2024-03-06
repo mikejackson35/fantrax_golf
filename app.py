@@ -15,27 +15,27 @@ alt.themes.enable("dark")
 
 config = {'displayModeBar': False}
 
-st.markdown("""
-<style>
+# st.markdown("""
+# <style>
             
-[data-baseweb="tab-list"] {
-    gap: 4px;
-}
+# [data-baseweb="tab-list"] {
+#     gap: 4px;
+# }
 
-[data-baseweb="tab"] {
-    height: 30px;
-    width: 500px;
-    white-space: pre-wrap;
-    background-color: #A29F99;
-    # background-color: #E8E6E3;
-    border-radius: 4px 4px 0px 0px;
-    gap: 1px;
-    padding-top: 8px;
-    padding-bottom: 8px;
-}
+# [data-baseweb="tab"] {
+#     height: 30px;
+#     width: 500px;
+#     white-space: pre-wrap;
+#     background-color: #A29F99;
+#     # background-color: #E8E6E3;
+#     border-radius: 4px 4px 0px 0px;
+#     gap: 1px;
+#     padding-top: 8px;
+#     padding-bottom: 8px;
+# }
             
-</style>
-        """, unsafe_allow_html=True)
+# </style>
+#         """, unsafe_allow_html=True)
 
 st.cache_data()
 def get_projections():
@@ -98,54 +98,6 @@ live_merged = live_merged[live_merged['team'].isin(team_name)]
 live_sg = live_merged[['sg_putt','sg_t2g','sg_total','gir']].reset_index()
 live_sg = live_sg.style.background_gradient(cmap='Greens').format(precision=2)
 
-# def highlight_rows(row):
-#     value = row.loc['Team']
-#     if value == 'unit_circle':
-#         color = '#FF99FF' # Pink
-#     elif value == 'Philly919':
-#         color = '#7f3c8d' # Purple
-#     elif value == 'AlphaWired':
-#         color = '#3969ac' # Blue
-#     elif value == 'Sneads Foot':
-#         color = '#f2b701' # Gold
-#     elif value == 'New Team 4':
-#         color = '#FF6666' # Magenta
-#     elif value == 'Team Gamble':
-#         color = '#e68310' # Orange
-#     elif value == 'txmoonshine':
-#         color = '#00868b' # Aqua
-#     else:
-#         color = '#a5aa99' # Grey
-#     return ['background-color: {}'.format(color) for r in row]
-
-# def highlight_rows2(row):
-#     value = row.loc['Team']
-#     if value == 'unit_circle':
-#         color = '#FF99FF' # Pink
-#         opacity = 0.25
-#     elif value == 'Philly919':
-#         color = '#7f3c8d' # Purple
-#         opacity = 0.25
-#     elif value == 'AlphaWired':
-#         color = '#3969ac' # Blue
-#         opacity = 0.25
-#     elif value == 'Sneads Foot':
-#         color = '#f2b701' # Gold
-#         opacity = 0.25
-#     elif value == 'New Team 4':
-#         color = '#FF6666' # Magenta
-#         opacity = 0.25
-#     elif value == 'Team Gamble':
-#         color = '#e68310' # Orange
-#         opacity = 0.25
-#     elif value == 'txmoonshine':
-#         color = '#00868b' # Aqua
-#         opacity = 0.25
-#     else:
-#         color = '#a5aa99' # Grey
-#         opacity = 0.25
-#     return ['background-color: {}; opacity: {}'.format(color,opacity) for r in row]
-
 
 live_merged['holes_remaining'] = (72 - (live_merged['thru']).fillna(0))
 live_merged['holes_remaining'] = np.where(live_merged['position']=='CUT',0,live_merged['holes_remaining']).astype('int')
@@ -162,27 +114,6 @@ cut_bar = px.bar(table,
 cut_bar.update_layout(showlegend=False,title_x=.25)
 cut_bar.update_yaxes(showticklabels=False,showgrid=False)
 cut_bar.update_traces(marker_color='rgb(200,200,200)',marker_line_width=1.5, opacity=0.6)
-
-# # table showing holes_remaining
-def highlight_cols(col):
-
-    if col.team == 'unit_circle':
-        color = '#FF99FF' # Pink
-    elif col.team == 'Philly919':
-        color = '#7f3c8d' # Purple
-    elif col.team == 'AlphaWired':
-        color = '#3969ac' # Blue
-    elif col.team == 'Sneads Foot':
-        color = '#f2b701' # Gold
-    elif col.team == 'New Team 4':
-        color = '#FF6666' # Magenta
-    elif col.team == 'Team Gamble':
-        color = '#e68310' # Orange
-    elif col.team == 'txmoonshine':
-        color = '#00868b' # Aqua
-    else:
-        color = '#a5aa99' # Grey
-    return ['background-color: {}'.format(color) for c in col]
 
 df_holes_remaining = live_merged.groupby('team',as_index=False)[['total','holes_remaining']].sum().rename(columns={'holes_remaining':'PHR','total':'To Par'})
 
