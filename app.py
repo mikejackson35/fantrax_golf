@@ -99,56 +99,27 @@ team_score_bar.update_traces(marker_color='rgb(200,200,200)',marker_line_width=1
 live_sg = live_merged[['player','sg_putt','sg_t2g','sg_total','gir']].reset_index(drop=True)
 live_sg = live_sg.style.background_gradient(cmap='Greens').format(precision=2)
 
-# ENSURES REFRESHED PAGE STARTS AT TOP
+# MAIN PAGE
 st.write("#")
-
-# TEAM MULTI-SELECT FILTERS AND PAGE TITLE
 team_name = st.multiselect(
     label='',
     options=np.array(live_merged['team'].unique()),
     default=np.array(live_merged['team'].unique()))
-
 st.write("###")
 st.write("###")
 st.write("###")
 st.markdown("<h3 style='text-align: center;;'>Live Leaderboard </h3>", unsafe_allow_html=True)
 
-
-
-# live_merged = live_merged[live_merged['team'].isin(team_name)]
-
-# live_sg = live_merged[['sg_putt','sg_t2g','sg_total','gir']].reset_index()
-# live_sg = live_sg.style.background_gradient(cmap='Greens').format(precision=2)
-
-
-# live_merged['holes_remaining'] = (72 - (live_merged['thru']).fillna(0))
-# live_merged['holes_remaining'] = np.where(live_merged['position']=='CUT',0,live_merged['holes_remaining']).astype('int')
-
-# table = pd.DataFrame(live_merged[live_merged.position !='CUT']['team'].value_counts())
-# cut_bar = px.bar(table,
-#                  template='presentation',
-#                  labels={'value':'','index':''},
-#                  text_auto=True,
-#                  height=250,
-#                  log_y=True,
-#                  title='Players Thru the Cut')
-
-# cut_bar.update_layout(showlegend=False,title_x=.25)
-# cut_bar.update_yaxes(showticklabels=False,showgrid=False)
-# cut_bar.update_traces(marker_color='rgb(200,200,200)',marker_line_width=1.5, opacity=0.6)
-
-# df_holes_remaining = live_merged.groupby('team',as_index=False)[['total','holes_remaining']].sum().rename(columns={'holes_remaining':'PHR','total':'To Par'})
-
-st.sidebar.markdown("<h2 style='text-align: center;;'>Arnold Palmer<br>Invitational </h2>", unsafe_allow_html=True)
-st.sidebar.markdown("###")
-st.sidebar.plotly_chart(team_score_bar, use_container_width=True,config = config)
-st.sidebar.dataframe(live_phr,hide_index=True,use_container_width=True)
-
-# st.sidebar.plotly_chart(thru_cut_bar, use_container_width=True,config = config)
-
+# SIDEBAR
 with st.expander('EXPAND for Live Strokes Gained'):
     st.dataframe(live_sg,height=1000,hide_index=True,use_container_width=True)
 st.dataframe(live_leaderboard,hide_index=True,height=1600,use_container_width=True, column_config={"Team": None})
+
+st.sidebar.markdown("<h4 style='text-align: center;;'>Arnold Palmer<br>Invitational </h4>", unsafe_allow_html=True)
+st.sidebar.markdown("---")
+st.sidebar.plotly_chart(team_score_bar, use_container_width=True,config = config)
+st.sidebar.dataframe(live_phr,hide_index=True,use_container_width=True)
+# st.sidebar.plotly_chart(thru_cut_bar, use_container_width=True,config = config)
 
 
     
