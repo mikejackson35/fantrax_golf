@@ -70,19 +70,11 @@ current_week = 9
 # live look at all 48 active players with player as index
 live_merged = pd.merge(teams, live, how='left', left_index=True, right_index=True).fillna(0).sort_values('total')
 live_merged_copy = live_merged.copy()
-live_merged[['total','round','thru']] = live_merged[['total','round','thru']].astype('int')#.rename(columns={'position':'Pos','total':'Total','round':'Round','thru':'Thru'})
+live_merged[['total','round','thru']] = live_merged[['total','round','thru']].astype('int')
 
-placeholder = st.empty()
-placeholder1 = st.sidebar.empty()
-placeholder2 = st.sidebar.empty()
 placeholder3 = st.sidebar.empty()
 placeholder4 = st.sidebar.empty()
 placeholder5 = st.sidebar.empty()
-
-holder_week = st.empty()
-header_holder = st.empty()
-holder_expander = st.empty()
-holder_leaderboard = st.empty()
 
 st.write("#")
 team_name = st.multiselect(
@@ -148,8 +140,6 @@ def highlight_rows2(row):
 live_merged['holes_remaining'] = (72 - (live_merged['thru']).fillna(0))
 live_merged['holes_remaining'] = np.where(live_merged['position']=='CUT',0,live_merged['holes_remaining']).astype('int')
 
-# team_score = live_merged.groupby('team')[['total']].sum()
-
 table = pd.DataFrame(live_merged[live_merged.position !='CUT']['team'].value_counts())
 cut_bar = px.bar(table,
                  template='presentation',
@@ -162,8 +152,6 @@ cut_bar = px.bar(table,
 cut_bar.update_layout(showlegend=False)#,title_x=.25)
 cut_bar.update_yaxes(showticklabels=False,showgrid=False)
 cut_bar.update_traces(marker_color='rgb(200,200,200)',marker_line_width=1.5, opacity=0.6)
-# table = table.merge(team_score, left_index=True, right_index=True).reset_index().rename(columns={'count':'Thru Cut','team':'Team','holes_remaining':'Holes Remaining','total':'Team Score'}).drop(columns='Holes Remaining')
-
 
 # table showing holes_remaining
 def highlight_cols(col):
@@ -190,21 +178,17 @@ df_holes_remaining = live_merged.groupby('team',as_index=False)[['holes_remainin
 
 live_merged = live_merged[['player','team','position','total','round','thru']].rename(columns={'player':'Player','team':'Team','position':'Pos','total':'Total','round':'Rnd','thru':'Thru'}).style.apply(highlight_rows, axis=1)
 
-# placeholder.markdown("")
-# placeholder1.subheader("Week 9")
-# placeholder2.title('Arnold Palmer Invitational')
-placeholder3.markdown("###")
-placeholder3.markdown("###")
-placeholder4.markdown('PLAYER HOLES REMAINING')
+placeholder3.header("The Arnold Palmer Invitational")
+placeholder4.markdown("###")
 placeholder5.dataframe(df_holes_remaining.sort_values(by='To Par').style.apply(highlight_cols, axis=1),hide_index=True,use_container_width=True)
+
 st.sidebar.plotly_chart(cut_bar, use_container_width=True,config = config)
 
-with holder_expander.expander('EXPAND Live Strokes Gained'):
+with st.expander('EXPAND Live Strokes Gained'):
     st.dataframe(live_sg,height=1000,hide_index=True,use_container_width=True)
 
-holder_week.markdown("week 9")
-header_holder.subheader('LEADERBOARD')
-holder_leaderboard.dataframe(live_merged,hide_index=True,height=1000,use_container_width=True)
+st.subheader('LEADERBOARD')
+st.dataframe(live_merged,hide_index=True,height=1000,use_container_width=True, column_config={"Team": None})
 
 
 
