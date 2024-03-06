@@ -185,7 +185,7 @@ placeholder5.dataframe(table.sort_values(by='Team Score'),hide_index=True,use_co
 st.markdown("###")
 st.markdown("###")
 st.markdown('Holes Remaining by Team')
-st.dataframe(df_holes_remaining.style.hide(axis=1).apply(highlight_cols, axis=0),hide_index=True,use_container_width=True)
+st.dataframe(df_holes_remaining.style.hide(axis=1).apply(highlight_cols, axis=0),hide_index=True)#,use_container_width=True)
 st.markdown("###")
 st.markdown("###")
 st.markdown('Leaderboard')
