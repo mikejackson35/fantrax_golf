@@ -10,6 +10,8 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+config = {'displayModeBar': False}
+
 st.markdown("""
 <style>
             
@@ -68,9 +70,6 @@ live_merged = pd.merge(teams, live, how='left', left_index=True, right_index=Tru
 live_merged_copy = live_merged.copy()
 live_merged[['total','round','thru']] = live_merged[['total','round','thru']].astype('int')#.rename(columns={'position':'Pos','total':'Total','round':'Round','thru':'Thru'})
 
-live_sg = live_merged[['sg_putt','sg_arg','sg_app','sg_ott','sg_t2g','sg_bs','sg_total']].reset_index()
-live_sg = live_sg.style.background_gradient(cmap='Greens').format(precision=1)
-
 
 placeholder1 = st.sidebar.empty()
 placeholder2 = st.sidebar.empty()
@@ -87,10 +86,13 @@ team_name = st.multiselect(
 
 live_merged = live_merged[live_merged['team'].isin(team_name)]
 
+live_sg = live_merged[['sg_putt','sg_arg','sg_app','sg_ott','sg_t2g','sg_bs','sg_total']].reset_index()
+live_sg = live_sg.style.background_gradient(cmap='Greens').format(precision=1)
+
 def highlight_rows(row):
     value = row.loc['Team']
     if value == 'unit_circle':
-        color = '#FFCCE5' # Pink
+        color = '#FF99FF' # Pink
     elif value == 'Philly919':
         color = '#7f3c8d' # Purple
     elif value == 'AlphaWired':
@@ -98,7 +100,7 @@ def highlight_rows(row):
     elif value == 'Sneads Foot':
         color = '#f2b701' # Gold
     elif value == 'New Team 4':
-        color = '#e73f74' # Magenta
+        color = '#FF6666' # Magenta
     elif value == 'Team Gamble':
         color = '#e68310' # Orange
     elif value == 'txmoonshine':
@@ -122,7 +124,7 @@ def highlight_rows2(row):
         color = '#f2b701' # Gold
         opacity = 0.25
     elif value == 'New Team 4':
-        color = '#e73f74' # Magenta
+        color = '#FF6666' # Magenta
         opacity = 0.25
     elif value == 'Team Gamble':
         color = '#e68310' # Orange
@@ -168,7 +170,7 @@ def highlight_cols(col):
     elif col.team == 'Sneads Foot':
         color = '#f2b701' # Gold
     elif col.team == 'New Team 4':
-        color = '#e73f74' # Magenta
+        color = '#FF6666' # Magenta
     elif col.team == 'Team Gamble':
         color = '#e68310' # Orange
     elif col.team == 'txmoonshine':
@@ -185,14 +187,14 @@ placeholder1.subheader("Week 9")
 placeholder2.title('Arnold Palmer Invitational')
 placeholder3.markdown("###")
 placeholder3.markdown("###")
-placeholder4.markdown('HOLES REMAINING / TEAM SCORE')
+placeholder4.markdown('PLAYER HOLES REMAINING')
 placeholder5.dataframe(df_holes_remaining.sort_values(by='To Par').style.apply(highlight_cols, axis=1),hide_index=True,use_container_width=True)
 # st.markdown("###")
 # st.markdown("###")
 # st.markdown('PLAYERS THRU THE CUT')
 # st.dataframe(df_holes_remaining.style.hide(axis=1).apply(highlight_cols, axis=1),hide_index=True,use_container_width=True)
 # st.dataframe(table,hide_index=True,use_container_width=True)
-st.sidebar.plotly_chart(cut_bar, use_container_width=True)
+st.sidebar.plotly_chart(cut_bar, use_container_width=True,config = config)
 st.markdown("###")
 with st.expander('Show Live Strokes Gained Stats'):
     st.dataframe(live_sg,height=1000,hide_index=True,use_container_width=True)
