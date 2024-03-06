@@ -77,7 +77,10 @@ placeholder4 = st.sidebar.empty()
 placeholder5 = st.sidebar.empty()
 
 st.write("#")
-st.subheader('LEADERBOARD')
+st.markdown("<h3 style='text-align: center;;'>Live Leaderboard </h3>", unsafe_allow_html=True)
+# st.subheader('LEADERBOARD')
+
+
 team_name = st.multiselect(
     label='',
     options=np.array(live_merged['team'].unique()),
@@ -86,7 +89,7 @@ team_name = st.multiselect(
 
 live_merged = live_merged[live_merged['team'].isin(team_name)]
 
-live_sg = live_merged[['sg_putt','sg_arg','sg_app','sg_ott','sg_t2g','sg_bs','sg_total']].reset_index()
+live_sg = live_merged[['sg_putt','sg_t2g','sg_total']].reset_index()
 live_sg = live_sg.style.background_gradient(cmap='Greens').format(precision=1)
 
 def highlight_rows(row):
@@ -112,7 +115,7 @@ def highlight_rows(row):
 def highlight_rows2(row):
     value = row.loc['Team']
     if value == 'unit_circle':
-        color = '#FFCCE5' # Pink
+        color = '#FF99FF' # Pink
         opacity = 0.25
     elif value == 'Philly919':
         color = '#7f3c8d' # Purple
@@ -150,7 +153,7 @@ cut_bar = px.bar(table,
                  log_y=True,
                  title='Players Thru the Cut')
 
-cut_bar.update_layout(showlegend=False)#,title_x=.25)
+cut_bar.update_layout(showlegend=False,title_x=.25)
 cut_bar.update_yaxes(showticklabels=False,showgrid=False)
 cut_bar.update_traces(marker_color='rgb(200,200,200)',marker_line_width=1.5, opacity=0.6)
 
@@ -158,7 +161,7 @@ cut_bar.update_traces(marker_color='rgb(200,200,200)',marker_line_width=1.5, opa
 def highlight_cols(col):
 
     if col.team == 'unit_circle':
-        color = '#FFCCE5' # Pink
+        color = '#FF99FF' # Pink
     elif col.team == 'Philly919':
         color = '#7f3c8d' # Purple
     elif col.team == 'AlphaWired':
@@ -175,26 +178,22 @@ def highlight_cols(col):
         color = '#a5aa99' # Grey
     return ['background-color: {}'.format(color) for c in col]
 
-df_holes_remaining = live_merged.groupby('team',as_index=False)[['holes_remaining','total']].sum().rename(columns={'holes_remaining':'PHR','total':'To Par'})
+df_holes_remaining = live_merged.groupby('team',as_index=False)[['total','holes_remaining']].sum().rename(columns={'holes_remaining':'PHR','total':'To Par'})
 
 live_merged = live_merged[['player','team','position','total','round','thru']].rename(columns={'player':'Player','team':'Team','position':'Pos','total':'Total','round':'Rnd','thru':'Thru'}).style.apply(highlight_rows, axis=1)
 
-placeholder3.header("The Arnold Palmer Invitational")
+placeholder3.markdown("<h2 style='text-align: center;;'>Arnold Palmer<br>Invitational </h2>", unsafe_allow_html=True)
 placeholder4.markdown("###")
 placeholder5.dataframe(df_holes_remaining.sort_values(by='To Par').style.apply(highlight_cols, axis=1),hide_index=True,use_container_width=True)
 
 st.sidebar.plotly_chart(cut_bar, use_container_width=True,config = config)
 
-with st.expander('EXPAND Live Strokes Gained'):
+st.write("###")
+st.write("###")
+st.write("###")
+with st.expander('EXPAND for Live Strokes Gained'):
     st.dataframe(live_sg,height=1000,hide_index=True,use_container_width=True)
-
-st.write("###")
-st.write("###")
-st.write("###")
-st.dataframe(live_merged,hide_index=True,height=1000,use_container_width=True, column_config={"Team": None})
-
-
-
+st.dataframe(live_merged,hide_index=True,height=1600,use_container_width=True, column_config={"Team": None})
 
 
     
