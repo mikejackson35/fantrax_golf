@@ -111,7 +111,7 @@ live_sg = live_sg.style.background_gradient(cmap='Greens').format(precision=2)
 st.markdown("<h3 style='text-align: center;;'>Live Leaderboard </h3>", unsafe_allow_html=True)
 with st.expander('EXPAND for Live Strokes Gained'):
     st.dataframe(live_sg,height=1000,hide_index=True,use_container_width=True)
-st.dataframe(live_leaderboard,hide_index=True,height=1600,use_container_width=True, column_config={"Team": None})
+st.dataframe(live_leaderboard,hide_index=True,height=2000,use_container_width=True, column_config={"Team": None})
 
 ### SIDEBAR ###
 st.sidebar.markdown("<h4 style='text-align: center;;'>Arnold Palmer<br>Invitational </h4>", unsafe_allow_html=True)
