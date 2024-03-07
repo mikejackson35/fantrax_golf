@@ -58,26 +58,31 @@ live_merged = pd.merge(teams, live, how='left', left_index=True, right_index=Tru
 live_merged['holes_remaining'] = (72 - (live_merged['thru']).fillna(0))
 live_merged['holes_remaining'] = np.where(live_merged['position']=='CUT',0,live_merged['holes_remaining']).astype('int')
 
+sidebar_title = st.sidebar.empty()
+st.sidebar.markdown("---")
+sidebar_phr_table = st.sidebar.empty()
+
 ### TEAM FILTER CHARTS ###
-team_name = st.multiselect(
+team_name = st.sidebar.multiselect(
     label='',
     options=np.array(live_merged['team'].unique()),
     default=np.array(live_merged['team'].unique()))
-st.write("###")
-st.write("###")
+# st.write("###")
+# st.write("###")
 
 # 1 live leaderboard
 live_leaderboard = live_merged[['player','team','position','total','round','thru']].fillna(0).sort_values('total')
 live_leaderboard[['total','round','thru']] = live_leaderboard[['total','round','thru']].astype('int')
+# live_leaderboard = live_leaderboard['total'].replace(to_replace=0,value='E')
 live_board = live_leaderboard.copy()
 live_leaderboard = (live_leaderboard[live_leaderboard.team.isin(team_name)]
                     .rename(columns={'player':'Player','team':'Team','position':'Pos','total':'Total','round':'Round','thru':'Thru'})
                     .style.apply(highlight_rows, axis=1))
 
 # 2 PHR
-live_phr = live_merged[live_merged.team.isin(team_name)].groupby('team')[['holes_remaining']].sum().reset_index().rename(columns={'team':'Team','holes_remaining':'PHR'})
+live_phr = live_merged[live_merged.team.isin(team_name)].groupby('team')[['total','holes_remaining']].sum().reset_index().rename(columns={'team':'Team','holes_remaining':'PHR'})
 live_phr = (live_phr
-            .sort_values(by='PHR')
+            .sort_values(by='total')
             .style.apply(highlight_rows, axis=1))
 
 # 3 thru-cut bar
@@ -106,21 +111,17 @@ team_score_bar.update_yaxes(showticklabels=False,showgrid=False)
 team_score_bar.update_traces(marker_color='rgb(200,200,200)',marker_line_width=1.5, opacity=0.6)
 
 # 5 live sg
-live_sg = live_merged[live_merged.team.isin(team_name)][['player','sg_putt','sg_t2g','sg_total','gir']].reset_index(drop=True)
+live_sg = live_merged[live_merged.team.isin(team_name)].groupby('team',as_index=False)[['sg_putt','sg_t2g','sg_total','gir']].mean().reset_index(drop=True)
 live_sg = live_sg.style.background_gradient(cmap='Greens').format(precision=2)
 
 ### MAIN PAGE ###
+
+# st.plotly_chart(thru_cut_bar, use_container_width=True,config = config)
 st.markdown("<h3 style='text-align: center;;'>Live Leaderboard </h3>", unsafe_allow_html=True)
 with st.expander('EXPAND for Live Strokes Gained'):
-    st.dataframe(live_sg,height=1000,hide_index=True,use_container_width=True)
-st.dataframe(live_leaderboard,hide_index=True,height=2000,use_container_width=True, column_config={"Team": None})
+    st.dataframe(live_sg,height=330,hide_index=True,use_container_width=True)
+st.dataframe(live_leaderboard,hide_index=True,height=1750,use_container_width=True, column_config={"Team": None})
 
 ### SIDEBAR ###
-st.sidebar.markdown("<h4 style='text-align: center;;'>Arnold Palmer<br>Invitational </h4>", unsafe_allow_html=True)
-st.sidebar.markdown("---")
-st.sidebar.dataframe(live_phr,hide_index=True,use_container_width=True)
-st.sidebar.plotly_chart(team_score_bar, use_container_width=True,config = config)
-# st.sidebar.plotly_chart(thru_cut_bar, use_container_width=True,config = config)
-
-
-    
+sidebar_title.markdown("<h2 style='text-align: center;'>Arnold Palmer<br>Invitational </h2>", unsafe_allow_html=True)
+sidebar_phr_table.dataframe(live_phr,hide_index=True,use_container_width=True)
