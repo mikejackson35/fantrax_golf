@@ -99,7 +99,7 @@ team_score_bar = px.bar(team_score_df,
                      text_auto=True,
                      height=250,
                      title='Team Score')
-team_score_bar.update_layout(showlegend=False,title_x=.25)
+team_score_bar.update_layout(showlegend=False,title_x=.33)
 team_score_bar.update_yaxes(showticklabels=False,showgrid=False)
 team_score_bar.update_traces(marker_color='rgb(200,200,200)',marker_line_width=1.5, opacity=0.6)
 
