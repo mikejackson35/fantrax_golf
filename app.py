@@ -118,7 +118,7 @@ live_sg = live_sg.style.background_gradient(cmap='Greens').format(precision=2)
 
 # st.plotly_chart(thru_cut_bar, use_container_width=True,config = config)
 st.markdown("<h3 style='text-align: center;;'>Live Leaderboard </h3>", unsafe_allow_html=True)
-with st.expander('EXPAND for Live Strokes Gained'):
+with st.expander('Strokes Gained by Team'):
     st.dataframe(live_sg,height=330,hide_index=True,use_container_width=True)
 st.dataframe(live_leaderboard,hide_index=True,height=1750,use_container_width=True, column_config={"Team": None})
 
