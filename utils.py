@@ -7,21 +7,21 @@ import altair as alt
 def highlight_rows(row):
     value = row.loc['Team']
     if value == 'unit_circle':
-        color = '#FF99FF' # Pink
+        color = '#c28bdd' # Pink
     elif value == 'Philly919':
-        color = '#7f3c8d' # Purple
+        color = '#0ec3d2' # Purple
     elif value == 'AlphaWired':
-        color = '#3969ac' # Blue
+        color = '#f7a05d' # Blue
     elif value == 'Sneads Foot':
-        color = '#f2b701' # Gold
+        color = '#46d671' # Gold
     elif value == 'New Team 4':
-        color = '#FF6666' # Magenta
+        color = '#f75e38' # Magenta
     elif value == 'Team Gamble':
-        color = '#e68310' # Orange
+        color = '#2693be' # Orange
     elif value == 'txmoonshine':
-        color = '#00868b' # Aqua
+        color = '#dbc530' # Aqua
     else:
-        color = '#a5aa99' # Grey
+        color = '#73706a' # Grey
     return ['background-color: {}'.format(color) for r in row]
 
 def highlight_cols(col):
