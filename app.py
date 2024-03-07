@@ -4,6 +4,7 @@ import plotly.express as px
 import streamlit as st
 import altair as alt
 from utils import highlight_rows
+import secrets
 
 st.set_page_config(
     page_title="fantrax-golf",
@@ -20,7 +21,7 @@ config = {'displayModeBar': False}
 # GET LIVE GOLF DATA
 st.cache_data()
 def get_projections():
-    live = pd.read_csv(r"https://feeds.datagolf.com/preds/live-tournament-stats?stats=sg_putt,sg_arg,sg_app,sg_ott,sg_t2g,sg_bs,sg_total,distance,accuracy,gir,prox_fw,prox_rgh,scrambling&round=event_avg&display=value&file_format=csv&key=e297e933c3ad47d71ec1626c299e")#,usecols=['dk_name','total_points'])
+    live = pd.read_csv(f"https://feeds.datagolf.com/preds/live-tournament-stats?stats=sg_putt,sg_arg,sg_app,sg_ott,sg_t2g,sg_bs,sg_total,distance,accuracy,gir,prox_fw,prox_rgh,scrambling&round=event_avg&display=value&file_format=csv&key={dg_key}")#,usecols=['dk_name','total_points'])
     return live
 live = get_projections()
 live.rename(columns={'player_name':'player'},inplace=True)
