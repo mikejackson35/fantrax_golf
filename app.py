@@ -70,14 +70,26 @@ team_name = st.sidebar.multiselect(
 # st.write("###")
 # st.write("###")
 
-# 1 live leaderboard
 live_leaderboard = live_merged[['player','team','position','total','round','thru']].fillna(0).sort_values('total')
+
 live_leaderboard[['total','round','thru']] = live_leaderboard[['total','round','thru']].astype('int')
-# live_leaderboard = live_leaderboard['total'].replace(to_replace=0,value='E')
+
+live_leaderboard['total'] = np.where(live_leaderboard['total'] == 0, "E", live_leaderboard['total'])
+live_leaderboard['round'] = np.where(live_leaderboard['round'] == 0, "E", live_leaderboard['round'])
+live_leaderboard['position'] = np.where(live_leaderboard['position'] == "WAITING", "-", live_leaderboard['position'])
+live_leaderboard['thru'] = np.where(live_leaderboard['thru'] == 0, "-", live_leaderboard['thru'])
 live_board = live_leaderboard.copy()
-live_leaderboard = (live_leaderboard[live_leaderboard.team.isin(team_name)]
-                    .rename(columns={'player':'Player','team':'Team','position':'Pos','total':'Total','round':'Round','thru':'Thru'})
-                    .style.apply(highlight_rows, axis=1))
+live_leaderboard = live_leaderboard.rename(columns={'player':'Player','team':'Team','position':'Pos','total':'Total','round':'Round','thru':'Thru'}).style.apply(highlight_rows, axis=1)
+
+
+
+# 1 live leaderboard
+# live_leaderboard = live_merged[['player','team','position','total','round','thru']].fillna(0).sort_values('total')
+# live_leaderboard[['total','round','thru']] = live_leaderboard[['total','round','thru']].astype('int')
+# live_board = live_leaderboard.copy()
+# live_leaderboard = (live_leaderboard[live_leaderboard.team.isin(team_name)]
+#                     .rename(columns={'player':'Player','team':'Team','position':'Pos','total':'Total','round':'Round','thru':'Thru'})
+#                     .style.apply(highlight_rows, axis=1))
 
 # 2 PHR
 live_phr = live_merged[live_merged.team.isin(team_name)].groupby('team')[['total','holes_remaining']].sum().reset_index().rename(columns={'team':'Team','holes_remaining':'PHR'})
