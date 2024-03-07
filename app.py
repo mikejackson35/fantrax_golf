@@ -81,20 +81,13 @@ live_leaderboard['thru'] = np.where(live_leaderboard['thru'] == 0, "-", live_lea
 live_board = live_leaderboard.copy()
 live_leaderboard = live_leaderboard.rename(columns={'player':'Player','team':'Team','position':'Pos','total':'Total','round':'Round','thru':'Thru'}).style.apply(highlight_rows, axis=1)
 
-
-
-# 1 live leaderboard
-# live_leaderboard = live_merged[['player','team','position','total','round','thru']].fillna(0).sort_values('total')
-# live_leaderboard[['total','round','thru']] = live_leaderboard[['total','round','thru']].astype('int')
-# live_board = live_leaderboard.copy()
-# live_leaderboard = (live_leaderboard[live_leaderboard.team.isin(team_name)]
-#                     .rename(columns={'player':'Player','team':'Team','position':'Pos','total':'Total','round':'Round','thru':'Thru'})
-#                     .style.apply(highlight_rows, axis=1))
-
 # 2 PHR
-live_phr = live_merged[live_merged.team.isin(team_name)].groupby('team')[['total','holes_remaining']].sum().reset_index().rename(columns={'team':'Team','holes_remaining':'PHR'})
+live_phr = live_merged[live_merged.team.isin(team_name)].groupby('team')[['total','holes_remaining']].sum().reset_index().rename(columns={'team':'Team','total':'Total','holes_remaining':'PHR'})
+live_phr = live_phr.sort_values(by='Total')
+live_phr['Total'] = np.where(live_phr['Total'] == 0, "E", live_phr['Total'])
+live_phr['PHR'] = np.where(live_phr['PHR'] == 0, "0", live_phr['PHR'])
 live_phr = (live_phr
-            .sort_values(by='total')
+            # .sort_values(by='total')
             .style.apply(highlight_rows, axis=1))
 
 # 3 thru-cut bar
