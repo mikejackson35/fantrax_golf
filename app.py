@@ -98,7 +98,7 @@ thru_cut_bar = px.bar(thru_cut_df,
                  height=250,
                  log_y=True,
                  title='Players Thru the Cut')
-thru_cut_bar.update_layout(showlegend=False,title_x=.25)
+thru_cut_bar.update_layout(showlegend=False,title_x=.5)
 thru_cut_bar.update_yaxes(showticklabels=False,showgrid=False)
 thru_cut_bar.update_traces(marker_color='rgb(200,200,200)',marker_line_width=1.5, opacity=0.6)
 
@@ -121,7 +121,7 @@ live_sg = live_sg.style.background_gradient(cmap='Greens').format(precision=2)
 
 ### MAIN PAGE ###
 
-st.plotly_chart(thru_cut_bar, use_container_width=True,config = config)
+st.sidebar.plotly_chart(thru_cut_bar, use_container_width=True,config = config)
 st.markdown("<h3 style='text-align: center;;'>Live Leaderboard </h3>", unsafe_allow_html=True)
 with st.expander('Strokes Gained by Team'):
     st.dataframe(live_sg,height=330,hide_index=True,use_container_width=True)
