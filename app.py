@@ -99,7 +99,7 @@ thru_cut_bar = px.bar(thru_cut_df,
                  height=250,
                  log_y=True,
                  title='Players Thru the Cut')
-thru_cut_bar.update_layout(showlegend=False,title_x=.5)
+thru_cut_bar.update_layout(showlegend=False,title_x=.3)
 thru_cut_bar.update_yaxes(showticklabels=False,showgrid=False)
 thru_cut_bar.update_traces(marker_color='rgb(200,200,200)',marker_line_width=1.5, opacity=0.6)
 
