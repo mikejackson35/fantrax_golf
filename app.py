@@ -94,7 +94,7 @@ live_phr = (live_phr
 thru_cut_df = live_board[(live_board.position!='CUT') & (live_board.team.isin(team_name))]['team'].value_counts()
 thru_cut_bar = px.bar(thru_cut_df,
                  template='presentation',
-                 labels={'value':'','index':''},
+                 labels={'value':'','team':''},
                  text_auto=True,
                  height=250,
                  log_y=True,
@@ -121,7 +121,7 @@ live_sg.columns = ['Team','SG Putt','SG Arg','SG App','SG T2G']
 live_sg = live_sg.style.background_gradient(cmap='Greens').format(precision=2)
 
 ### MAIN PAGE ###
-
+st.plotly_chart(thru_cut_bar, use_container_width=True,config = config)
 st.markdown("<h3 style='text-align: center;;'>Live Leaderboard </h3>", unsafe_allow_html=True)
 with st.expander('Strokes Gained by Team'):
     st.dataframe(live_sg,height=330,hide_index=True,use_container_width=True)
@@ -129,5 +129,5 @@ st.dataframe(live_leaderboard,hide_index=True,height=1750,use_container_width=Tr
 
 ### SIDEBAR ###
 sidebar_title.markdown("<h2 style='text-align: center;'>Arnold Palmer<br>Invitational </h2>", unsafe_allow_html=True)
-sidebar_thru_cut_bar.plotly_chart(thru_cut_bar, use_container_width=True,config = config)
+# sidebar_thru_cut_bar.plotly_chart(thru_cut_bar, use_container_width=True,config = config)
 sidebar_phr_table.dataframe(live_phr,hide_index=True,use_container_width=True)
