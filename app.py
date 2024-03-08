@@ -117,7 +117,7 @@ team_score_bar.update_traces(marker_color='rgb(200,200,200)',marker_line_width=1
 
 # 5 live sg
 live_sg = live_merged[live_merged.team.isin(team_name)].groupby('team',as_index=False)[['sg_putt','sg_arg','sg_app','sg_t2g']].sum().reset_index(drop=True)
-live_sg.columns = ['Team','SG Putt','SG T2G','SG Total','Greens in Reg']
+live_sg.columns = ['Team','SG Putt','SG Arg','SG App','SG T2G']
 live_sg = live_sg.style.background_gradient(cmap='Greens').format(precision=2)
 
 ### MAIN PAGE ###
