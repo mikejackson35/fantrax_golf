@@ -55,7 +55,7 @@ teams = teams.loc[teams.active_reserve=='Active'].set_index('player')
 
 ### MERGE ACTIVE ROSTERS WITH LIVE SCORING ###
 live_merged = pd.merge(teams, live, how='left', left_index=True, right_index=True).fillna(0).sort_values('total')
-live_merged['holes_remaining'] = (72 - (live_merged['thru']).fillna(0))
+live_merged['holes_remaining'] = (54 - (live_merged['thru']).fillna(0))
 live_merged['holes_remaining'] = np.where(live_merged['position']=='CUT',0,live_merged['holes_remaining']).astype('int')
 
 sidebar_title = st.sidebar.empty()
@@ -67,8 +67,6 @@ team_name = st.sidebar.multiselect(
     label='',
     options=np.array(live_merged['team'].unique()),
     default=np.array(live_merged['team'].unique()))
-# st.write("###")
-# st.write("###")
 
 live_leaderboard = live_merged[['player','team','position','total','round','thru']].fillna(0).sort_values('total')
 
