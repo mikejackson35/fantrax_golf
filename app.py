@@ -18,13 +18,12 @@ with open(r"styles/main.css") as f:
     st.markdown("<style>{}</style>".format(f.read()), unsafe_allow_html=True)
 config = {'displayModeBar': False}
 
-# dg_key = st.secrets.dg_key
+dg_key = st.secrets.dg_key
 
 # GET LIVE GOLF DATA
 st.cache_data()
 def get_projections():
-    # live = pd.read_csv(f"https://feeds.datagolf.com/preds/live-tournament-stats?stats=sg_putt,sg_arg,sg_app,sg_ott,sg_t2g,sg_bs,sg_total,distance,accuracy,gir,prox_fw,prox_rgh,scrambling&round=event_avg&display=value&file_format=csv&key={dg_key}")
-    live = pd.read_csv(f"https://feeds.datagolf.com/preds/live-tournament-stats?stats=sg_putt,sg_arg,sg_app,sg_ott,sg_t2g,sg_bs,sg_total,distance,accuracy,gir,prox_fw,prox_rgh,scrambling&round=event_avg&display=value&file_format=csv&key=e297e933c3ad47d71ec1626c299e")
+    live = pd.read_csv(f"https://feeds.datagolf.com/preds/live-tournament-stats?stats=sg_putt,sg_arg,sg_app,sg_ott,sg_t2g,sg_bs,sg_total,distance,accuracy,gir,prox_fw,prox_rgh,scrambling&round=event_avg&display=value&file_format=csv&key={dg_key}")
     return live
 live = get_projections()
 live.rename(columns={'player_name':'player'},inplace=True)
