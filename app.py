@@ -43,7 +43,7 @@ live = live.set_index(names.player)
 ### GET FANTRAX ACTIVE ROSTERS ###
 st.cache_data()
 def get_fantrax():
-    teams = pd.read_csv(r"fx_wk9.csv",usecols=['Player','Status','Roster Status'])
+    teams = pd.read_csv(r"fx_wk10.csv",usecols=['Player','Status','Roster Status'])
     return teams
 teams = get_fantrax()
 
