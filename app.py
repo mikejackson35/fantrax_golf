@@ -55,7 +55,7 @@ teams = teams.loc[teams.active_reserve=='Active'].set_index('player')
 
 ### MERGE ACTIVE ROSTERS WITH LIVE SCORING ###
 live_merged = pd.merge(teams, live, how='left', left_index=True, right_index=True).fillna(0).sort_values('total')
-live_merged['holes_remaining'] = (18 - (live_merged['thru']).fillna(0))
+live_merged['holes_remaining'] = (72 - (live_merged['thru']).fillna(0))
 live_merged['holes_remaining'] = np.where(live_merged['position']=='CUT',0,live_merged['holes_remaining']).astype('int')
 
 # SIDEBAR PLACEHOLDERS
