@@ -57,6 +57,7 @@ teams = teams.loc[teams.active_reserve=='Active'].set_index('player')
 live_merged = pd.merge(teams, live, how='left', left_index=True, right_index=True).fillna(0).sort_values('total')
 live_merged['holes_remaining'] = (36 - (live_merged['thru']).fillna(0))
 live_merged['holes_remaining'] = np.where(live_merged['position']=='CUT',0,live_merged['holes_remaining']).astype('int')
+live_merged['holes_remaining'] = np.where(live_merged['position']=='WD',0,live_merged['holes_remaining']).astype('int')
 
 # SIDEBAR PLACEHOLDERS
 sidebar_title = st.sidebar.empty()
