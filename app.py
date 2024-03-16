@@ -92,7 +92,7 @@ live_phr = (live_phr
             .style.apply(highlight_rows, axis=1))
 
 # 3 thru-cut bar
-thru_cut_df = live_board[(live_board.position!='CUT') & (live_board.team.isin(team_name))]['team'].value_counts()
+thru_cut_df = live_board[(live_board.position!='CUT') & (live_board.position!='WD') & (live_board.team.isin(team_name))]['team'].value_counts()
 thru_cut_bar = px.bar(thru_cut_df,
                  template='presentation',
                  labels={'value':'','team':''},
