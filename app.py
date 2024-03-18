@@ -55,21 +55,32 @@ teams = teams.loc[teams.active_reserve=='Active'].set_index('player')
 
 ### MERGE ACTIVE ROSTERS WITH LIVE SCORING ###
 live_merged = pd.merge(teams, live, how='left', left_index=True, right_index=True).fillna(0).sort_values('total')
-live_merged['holes_remaining'] = (18 - (live_merged['thru']).fillna(0))
+live_merged['holes_remaining'] = (72 - (live_merged['thru']).fillna(0))
 live_merged['holes_remaining'] = np.where(live_merged['position']=='CUT',0,live_merged['holes_remaining']).astype('int')
 live_merged['holes_remaining'] = np.where(live_merged['position']=='WD',0,live_merged['holes_remaining']).astype('int')
 
-# SIDEBAR PLACEHOLDERS
-sidebar_title = st.sidebar.empty()
-st.sidebar.markdown("---")
-sidebar_phr_table = st.sidebar.empty()
-sidebar_thru_cut_bar = st.sidebar.empty()
+matchups = [
+    ['unit_circle','Putt Pirates'],
+    ['AlphaWired','txmoonshine'],
+    ['Sneads Foot','New Team 4'],
+    ['Team Gamble','Philly919']
+    ]
 
-### TEAM FILTER ###
-team_name = st.sidebar.multiselect(
-    label='',
-    options=np.array(live_merged['team'].unique()),
-    default=np.array(live_merged['team'].unique()))
+
+# SIDEBAR
+sidebar_title = st.sidebar.empty()                              # placeholder - title
+st.sidebar.markdown("---")
+sidebar_phr_table = st.sidebar.empty()                          # placeholder - phr table
+sidebar_thru_cut_bar = st.sidebar.empty()                       # placeholder - thru cut bar
+# team_name = st.sidebar.multiselect(                             # team filter
+#     label='',
+#     options=np.array(live_merged['team'].unique()),
+#     default=np.array(live_merged['team'].unique()))
+matchup = st.sidebar.multiselect(
+    label='Matchup',
+    options=matchups,
+    default=matchups
+)
 
 #1 LIVE LEADERBOARD
 live_leaderboard = live_merged[['player','team','position','total','round','thru']].fillna(0).sort_values('total')
@@ -83,7 +94,7 @@ live_leaderboard['thru'] = np.where(live_leaderboard['thru'] == 0, "-", live_lea
 live_board = live_leaderboard.copy()
 live_leaderboard = live_leaderboard[live_leaderboard.team.isin(team_name)].rename(columns={'player':'Player','team':'Team','position':'Pos','total':'Total','round':'Round','thru':'Thru'}).style.apply(highlight_rows, axis=1)
 
-# 2 PHR
+# 2 PLAYER HOLES REMAINING TABLE
 live_phr = live_merged[live_merged.team.isin(team_name)].groupby('team')[['total','holes_remaining']].sum().reset_index().rename(columns={'team':'Team','total':'Total','holes_remaining':'PHR'})
 live_phr = live_phr.sort_values(by='Total')
 live_phr['Total'] = np.where(live_phr['Total'] == 0, "E", live_phr['Total'])
@@ -92,7 +103,7 @@ live_phr = (live_phr
             # .sort_values(by='total')
             .style.apply(highlight_rows, axis=1))
 
-# 3 thru-cut bar
+# 3 THRU CUT BAR
 thru_cut_df = live_board[(live_board.position!='CUT') & (live_board.position!='WD') & (live_board.team.isin(team_name))]['team'].value_counts()
 thru_cut_bar = px.bar(thru_cut_df,
                  template='presentation',
@@ -106,23 +117,12 @@ thru_cut_bar.update_xaxes(showgrid=False,tickfont=dict(color='#5A5856', size=11)
 thru_cut_bar.update_yaxes(showticklabels=False,showgrid=False)
 thru_cut_bar.update_traces(marker_color='rgb(200,200,200)',marker_line_width=1.5, opacity=0.6)
 
-# 4 team score bar
-team_score_df = live_board[live_board.team.isin(team_name)].groupby('team')['total'].sum().sort_values()
-team_score_bar = px.bar(team_score_df,
-                     template='presentation',
-                     labels={'value':'','team':''},
-                     text_auto=True,
-                     height=250,
-                     title='Team Score')
-team_score_bar.update_layout(showlegend=False,title_x=.33)
-team_score_bar.update_yaxes(showticklabels=False,showgrid=False)
-team_score_bar.update_traces(marker_color='rgb(200,200,200)',marker_line_width=1.5, opacity=0.6)
-
-# 5 live sg
+# 4 LIVE STROKES GAINED TABLE
 live_sg = live_merged[live_merged.team.isin(team_name)].groupby('team',as_index=False)[['sg_putt','sg_arg','sg_app','sg_t2g']].sum().reset_index(drop=True)
 live_sg.columns = ['Team','SG Putt','SG Arg','SG App','SG T2G']
 live_sg = live_sg.style.background_gradient(cmap='Greens').format(precision=2)
 
+#################
 ### MAIN PAGE ###
 st.markdown("<h3 style='text-align: center;;'>Live Leaderboard</h3>", unsafe_allow_html=True)
 with st.expander('Strokes Gained by Team'):
