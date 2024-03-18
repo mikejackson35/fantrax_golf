@@ -66,7 +66,7 @@ live_merged['holes_remaining'] = (72 - (live_merged['thru']).fillna(0))
 live_merged['holes_remaining'] = np.where(live_merged['position']=='CUT',0,live_merged['holes_remaining']).astype('int')
 live_merged['holes_remaining'] = np.where(live_merged['position']=='WD',0,live_merged['holes_remaining']).astype('int')
 
-live_merged['matchup'] = pd.replace(live_merged['team'].isin(matchups[0]), matchups[0])
+live_merged['matchup'] = live_merged['team'].isin(matchups[0]).replace(matchups[0])
 live_merged['matchup'] = np.where(live_merged['team'].isin(matchups[1]), matchups[1],live_merged['team'])
 live_merged['matchup'] = np.where(live_merged['team'].isin(matchups[2]), matchups[2],live_merged['team'])
 live_merged['matchup'] = np.where(live_merged['team'].isin(matchups[3]), matchups[3],live_merged['team'])
