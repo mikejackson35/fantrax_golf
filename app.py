@@ -92,10 +92,10 @@ live_leaderboard['position'] = np.where(live_leaderboard['position'] == "WAITING
 live_leaderboard['thru'] = np.where(live_leaderboard['thru'] == 0, "-", live_leaderboard['thru'])
 
 live_board = live_leaderboard.copy()
-live_leaderboard = live_leaderboard[live_leaderboard.team.isin(team_name)].rename(columns={'player':'Player','team':'Team','position':'Pos','total':'Total','round':'Round','thru':'Thru'}).style.apply(highlight_rows, axis=1)
+live_leaderboard = live_leaderboard[live_leaderboard.team.isin(matchup)].rename(columns={'player':'Player','team':'Team','position':'Pos','total':'Total','round':'Round','thru':'Thru'}).style.apply(highlight_rows, axis=1)
 
 # 2 PLAYER HOLES REMAINING TABLE
-live_phr = live_merged[live_merged.team.isin(team_name)].groupby('team')[['total','holes_remaining']].sum().reset_index().rename(columns={'team':'Team','total':'Total','holes_remaining':'PHR'})
+live_phr = live_merged[live_merged.team.isin(matchup)].groupby('team')[['total','holes_remaining']].sum().reset_index().rename(columns={'team':'Team','total':'Total','holes_remaining':'PHR'})
 live_phr = live_phr.sort_values(by='Total')
 live_phr['Total'] = np.where(live_phr['Total'] == 0, "E", live_phr['Total'])
 live_phr['PHR'] = np.where(live_phr['PHR'] == 0, "0", live_phr['PHR'])
@@ -104,7 +104,7 @@ live_phr = (live_phr
             .style.apply(highlight_rows, axis=1))
 
 # 3 THRU CUT BAR
-thru_cut_df = live_board[(live_board.position!='CUT') & (live_board.position!='WD') & (live_board.team.isin(team_name))]['team'].value_counts()
+thru_cut_df = live_board[(live_board.position!='CUT') & (live_board.position!='WD') & (live_board.team.isin(matchup))]['team'].value_counts()
 thru_cut_bar = px.bar(thru_cut_df,
                  template='presentation',
                  labels={'value':'','team':''},
@@ -118,7 +118,7 @@ thru_cut_bar.update_yaxes(showticklabels=False,showgrid=False)
 thru_cut_bar.update_traces(marker_color='rgb(200,200,200)',marker_line_width=1.5, opacity=0.6)
 
 # 4 LIVE STROKES GAINED TABLE
-live_sg = live_merged[live_merged.team.isin(team_name)].groupby('team',as_index=False)[['sg_putt','sg_arg','sg_app','sg_t2g']].sum().reset_index(drop=True)
+live_sg = live_merged[live_merged.team.isin(matchup)].groupby('team',as_index=False)[['sg_putt','sg_arg','sg_app','sg_t2g']].sum().reset_index(drop=True)
 live_sg.columns = ['Team','SG Putt','SG Arg','SG App','SG T2G']
 live_sg = live_sg.style.background_gradient(cmap='Greens').format(precision=2)
 
