@@ -4,7 +4,7 @@ import plotly.express as px
 import streamlit as st
 import altair as alt
 from utils import highlight_rows
-import secrets
+# import secrets
 
 st.set_page_config(
     page_title="fantrax-golf",
@@ -18,8 +18,8 @@ with open(r"styles/main.css") as f:
     st.markdown("<style>{}</style>".format(f.read()), unsafe_allow_html=True)
 config = {'displayModeBar': False}
 
-dg_key = st.secrets.dg_key
-
+# dg_key = st.secrets.dg_key
+dg_key = "e297e933c3ad47d71ec1626c299e"
 # GET LIVE GOLF DATA
 st.cache_data()
 def get_projections():
@@ -66,10 +66,10 @@ live_merged['holes_remaining'] = (72 - (live_merged['thru']).fillna(0))
 live_merged['holes_remaining'] = np.where(live_merged['position']=='CUT',0,live_merged['holes_remaining']).astype('int')
 live_merged['holes_remaining'] = np.where(live_merged['position']=='WD',0,live_merged['holes_remaining']).astype('int')
 
-live_merged['matchup'] = live_merged['team'].isin(matchups[0]).replace(matchups[0])
-live_merged['matchup'] = live_merged['team'].isin(matchups[1]).replace(matchups[1])
-live_merged['matchup'] = live_merged['team'].isin(matchups[2]).replace(matchups[2])
-live_merged['matchup'] = live_merged['team'].isin(matchups[3]).replace(matchups[3])
+live_merged['matchup'] = live_merged['team'].isin(matchups[0]).replace([matchups[0]])
+live_merged['matchup'] = live_merged['team'].isin(matchups[1]).replace([matchups[1]])
+live_merged['matchup'] = live_merged['team'].isin(matchups[2]).replace([matchups[2]])
+live_merged['matchup'] = live_merged['team'].isin(matchups[3]).replace([matchups[3]])
 
 # SIDEBAR
 sidebar_title = st.sidebar.empty()                              # placeholder - title
