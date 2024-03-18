@@ -66,10 +66,10 @@ live_merged['holes_remaining'] = (72 - (live_merged['thru']).fillna(0))
 live_merged['holes_remaining'] = np.where(live_merged['position']=='CUT',0,live_merged['holes_remaining']).astype('int')
 live_merged['holes_remaining'] = np.where(live_merged['position']=='WD',0,live_merged['holes_remaining']).astype('int')
 
-live_merged['matchup'] = live_merged['team'].isin(matchups[0]).replace(matchups[0].to_list())
-live_merged['matchup'] = live_merged['team'].isin(matchups[1]).replace(matchups[1].to_list())
-live_merged['matchup'] = live_merged['team'].isin(matchups[2]).replace(matchups[2].to_list())
-live_merged['matchup'] = live_merged['team'].isin(matchups[3]).replace(matchups[3].to_list())
+live_merged['matchup'] = live_merged['team'].isin(matchups[0]).replace(matchups[0].values)
+live_merged['matchup'] = live_merged['team'].isin(matchups[1]).replace(matchups[1].values)
+live_merged['matchup'] = live_merged['team'].isin(matchups[2]).replace(matchups[2].values)
+live_merged['matchup'] = live_merged['team'].isin(matchups[3]).replace(matchups[3].values)
 
 # SIDEBAR
 sidebar_title = st.sidebar.empty()                              # placeholder - title
