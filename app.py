@@ -128,6 +128,6 @@ with st.expander('Strokes Gained by Team'):
 st.dataframe(live_leaderboard,hide_index=True,height=1750,use_container_width=True, column_config={"Team": None, "Matchup":None})
 
 ### SIDEBAR ###
-sidebar_title.markdown("<h2 style='text-align: center;'>Valspar<br>Championship</h2><br>Week 11", unsafe_allow_html=True)
+sidebar_title.markdown("<h2 style='text-align: center;'>Valspar<br>Championship<br><small>Week 11</small></h2><br>Week 11", unsafe_allow_html=True)
 # sidebar_thru_cut_bar.plotly_chart(thru_cut_bar, use_container_width=True,config = config)
 sidebar_phr_table.dataframe(live_phr,hide_index=True,use_container_width=True)
