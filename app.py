@@ -104,8 +104,6 @@ live_leaderboard = (
 )
 
 # 2 PLAYER HOLES REMAINING TABLE
-
-# Group by 'team' and calculate the sum of 'total' and 'holes_remaining' for each team
 live_phr = live_merged[live_merged.matchup_num.isin(matchup_num)].groupby('team').agg({'total': 'sum', 'holes_remaining': 'sum'}).reset_index()
 live_phr.rename(columns={'team': 'Team', 'total': 'Total', 'holes_remaining': 'PHR'}, inplace=True)
 live_phr.sort_values(by='Total', inplace=True)
@@ -113,24 +111,25 @@ live_phr['Total'] = live_phr['Total'].replace(0, 'E')
 live_phr['PHR'] = live_phr['PHR'].replace(0, '0')
 live_phr = live_phr.style.apply(highlight_rows, axis=1)
 
-# live_phr = live_merged[live_merged.matchup_num.isin(matchup_num)].groupby('team')[['total','holes_remaining']].sum().reset_index().rename(columns={'team':'Team','total':'Total','holes_remaining':'PHR','matchup_num':'Matchup'})
-# live_phr = live_phr.sort_values(by='Total')
-# live_phr['Total'] = np.where(live_phr['Total'] == 0, "E", live_phr['Total'])
-# live_phr['PHR'] = np.where(live_phr['PHR'] == 0, "0", live_phr['PHR'])
-# live_phr = (live_phr.style.apply(highlight_rows, axis=1))
-
 # 3 THRU CUT BAR
-thru_cut_df = live_board[(live_board.position!='CUT') & (live_board.position!='WD') & (live_board.matchup_num.isin(matchup_num))]['team'].value_counts()
-thru_cut_bar = px.bar(thru_cut_df,
-                 template='presentation',
-                 labels={'value':'','team':''},
-                 text_auto=True,
-                 height=250,
-                 log_y=True,
-                 title='Players Thru Cut')
-thru_cut_bar.update_layout(showlegend=False,title_x=.35)
-thru_cut_bar.update_xaxes(showgrid=False,tickfont=dict(color='#5A5856', size=11),title_font=dict(color='#5A5856',size=15))
-thru_cut_bar.update_yaxes(showticklabels=False,showgrid=False)
+thru_cut_df = live_board[(live_board['position'].isin(['CUT', 'WD']) == False) & (live_board['matchup_num'].isin(matchup_num))]['team'].value_counts()
+thru_cut_bar = px.bar(
+    thru_cut_df,
+    template='presentation',
+    labels={'value': '', 'team': ''},
+    text_auto=True,
+    height=250,
+    log_y=True,
+    title='Players Thru Cut'
+)
+
+thru_cut_bar.update_layout(
+    showlegend=False,
+    title_x=.35,
+    xaxis=dict(showgrid=False, tickfont=dict(color='#5A5856', size=11), title_font=dict(color='#5A5856', size=15)),
+    yaxis=dict(showticklabels=False, showgrid=False)
+)
+
 thru_cut_bar.update_traces(marker_color='rgb(200,200,200)',marker_line_width=1.5, opacity=0.6)
 
 # 4 LIVE STROKES GAINED TABLE
