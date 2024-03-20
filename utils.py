@@ -68,3 +68,14 @@ team_color={
                 "txmoonshine": 'rgb(0,134,139)',
                 "Putt Pirates": 'rgb(165,170,153)'}
 
+teams_dict = {
+    '919':'Philly919',
+    'u_c':'unit_circle',
+    'NT 4':'New Team 4'
+    ,'NT 8':'Sneads Foot',
+    'txms':'txmoonshine',
+    'MG':'Team Gamble',
+    'grrr':'Putt Pirates',
+    '[AW]':'AlphaWired'
+    }
+
