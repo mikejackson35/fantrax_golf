@@ -19,7 +19,6 @@ with open(r"styles/main.css") as f:
 config = {'displayModeBar': False}
 
 dg_key = st.secrets.dg_key
-
 # GET LIVE GOLF DATA
 st.cache_data()
 def get_projections():
