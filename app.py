@@ -3,23 +3,20 @@ import numpy as np
 import plotly.express as px
 import streamlit as st
 import altair as alt
-from utils import highlight_rows
+from utils import highlight_rows, teams_dict
 # import secrets
 
-st.set_page_config(
-    page_title="fantrax-golf",
-    layout="centered",
-    initial_sidebar_state="expanded",
-)
-alt.themes.enable("dark")
+### LIBRARY CONFIGs AND SECRETS KEYS ###
+st.set_page_config(page_title="fantrax-golf", layout="centered", initial_sidebar_state="expanded")    # streamlit
+alt.themes.enable("dark")                                                                             # altair
+with open(r"styles/main.css") as f:                                                                   # css
+    st.markdown("<style>{}</style>".format(f.read()), unsafe_allow_html=True)    
+config = {'displayModeBar': False}                                                                    # plotly
 
-# CSS and PLOTLY CONFIGS
-with open(r"styles/main.css") as f:
-    st.markdown("<style>{}</style>".format(f.read()), unsafe_allow_html=True)
-config = {'displayModeBar': False}
+dg_key = st.secrets.dg_key                                                                            # api keys
 
-dg_key = st.secrets.dg_key
-# GET LIVE GOLF DATA
+
+### GET LIVE GOLF DATA - prep and clean ###
 st.cache_data()
 def get_projections():
     live = pd.read_csv(f"https://feeds.datagolf.com/preds/live-tournament-stats?stats=sg_putt,sg_arg,sg_app,sg_ott,sg_t2g,sg_bs,sg_total,distance,accuracy,gir,prox_fw,prox_rgh,scrambling&round=event_avg&display=value&file_format=csv&key={dg_key}")
@@ -27,26 +24,26 @@ def get_projections():
 live = get_projections()
 live.rename(columns={'player_name':'player'},inplace=True)
 
-# prep live
-names = live['player'].str.split(expand=True)
-names[0] = names[0].str.rstrip(",")
+names = live['player'].str.split(expand=True)                                                           # reverse last/first name
+names[0] = names[0].str.rstrip(",")                                                                   
 names[1] = names[1].str.rstrip(",")
 names['player'] = names[1] + " " + names[0]
-names['player'] = np.where(names['player']=='Matt Fitzpatrick', 'Matthew Fitzpatrick', names['player'])
-names['player'] = np.where(names['player']=='Si Kim', 'Si Woo Kim', names['player'])
+names['player'] = np.where(names['player']=='Si Kim', 'Si Woo Kim', names['player'])                    #fix player names to match fantrax
 names['player'] = np.where(names['player']=='Min Lee', 'Min Woo Lee', names['player'])
+names['player'] = np.where(names['player']=='Matt Fitzpatrick', 'Matthew Fitzpatrick', names['player'])
 names['player'] = np.where(names['player']=='Byeong An', 'Byeong Hun An', names['player'])
 names['player'] = np.where(names['player']=='Rooyen Van', 'Erik Van Rooyen', names['player'])
 live = live.set_index(names.player)
 
-### GET FANTRAX ACTIVE ROSTERS ###
+
+### GET FANTRAX ACTIVE ROSTERS - prep and clean ###
 st.cache_data()
 def get_fantrax():
     teams = pd.read_csv(r"fantrax.csv",usecols=['Player','Status','Roster Status'])
     return teams
 teams = get_fantrax()
 
-matchups = {
+matchups = {                                    # enter weekly matchups here
     'unit_circle':1,
     'Putt Pirates':1,
     'AlphaWired':2,
@@ -57,11 +54,11 @@ matchups = {
     'Philly919':4
 }
 
-# prep fantrax
 teams.columns = ['player','team','active_reserve']
 teams_dict = {'919':'Philly919','u_c':'unit_circle','NT 4':'New Team 4','NT 8':'Sneads Foot','txms':'txmoonshine','MG':'Team Gamble','grrr':'Putt Pirates','[AW]':'AlphaWired'}
 teams['team'] = teams.team.map(teams_dict)
 teams = teams.loc[teams.active_reserve=='Active'].set_index('player')
+
 
 ### MERGE ACTIVE ROSTERS WITH LIVE SCORING ###
 live_merged = pd.merge(teams, live, how='left', left_index=True, right_index=True).fillna(0).sort_values('total')
