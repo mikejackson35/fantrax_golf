@@ -6,7 +6,8 @@ import altair as alt
 from utils import highlight_rows, teams_dict
 # import secrets
 
-### LIBRARY CONFIGs AND SECRETS KEYS ###
+##### LIBRARY CONFIGs AND SECRETS KEYS #####
+
 st.set_page_config(page_title="fantrax-golf", layout="centered", initial_sidebar_state="expanded")    # streamlit
 alt.themes.enable("dark")                                                                             # altair
 with open(r"styles/main.css") as f:                                                                   # css
@@ -16,7 +17,8 @@ config = {'displayModeBar': False}                                              
 dg_key = st.secrets.dg_key                                                                            # api keys
 
 
-### GET LIVE GOLF DATA - prep and clean ###
+##### GET LIVE GOLF DATA - prep and clean #####
+
 st.cache_data()
 def get_projections():
     live = pd.read_csv(f"https://feeds.datagolf.com/preds/live-tournament-stats?stats=sg_putt,sg_arg,sg_app,sg_ott,sg_t2g,sg_bs,sg_total,distance,accuracy,gir,prox_fw,prox_rgh,scrambling&round=event_avg&display=value&file_format=csv&key={dg_key}")
@@ -36,7 +38,8 @@ names['player'] = np.where(names['player']=='Rooyen Van', 'Erik Van Rooyen', nam
 live = live.set_index(names.player)
 
 
-### GET FANTRAX ACTIVE ROSTERS - prep and clean ###
+##### GET FANTRAX ACTIVE ROSTERS - prep and clean #####
+
 st.cache_data()
 def get_fantrax():
     teams = pd.read_csv(r"fantrax.csv",usecols=['Player','Status','Roster Status'])
@@ -55,12 +58,13 @@ matchups = {                                    # enter weekly matchups here
 }
 
 teams.columns = ['player','team','active_reserve']
-teams_dict = {'919':'Philly919','u_c':'unit_circle','NT 4':'New Team 4','NT 8':'Sneads Foot','txms':'txmoonshine','MG':'Team Gamble','grrr':'Putt Pirates','[AW]':'AlphaWired'}
+# teams_dict = {'919':'Philly919','u_c':'unit_circle','NT 4':'New Team 4','NT 8':'Sneads Foot','txms':'txmoonshine','MG':'Team Gamble','grrr':'Putt Pirates','[AW]':'AlphaWired'}
 teams['team'] = teams.team.map(teams_dict)
 teams = teams.loc[teams.active_reserve=='Active'].set_index('player')
 
 
-### MERGE ACTIVE ROSTERS WITH LIVE SCORING ###
+##### MERGE FANTRAX ACTIVE ROSTERS WITH DATAGOLF LIVE SCORING #####
+
 live_merged = pd.merge(teams, live, how='left', left_index=True, right_index=True).fillna(0).sort_values('total')
 live_merged['holes_remaining'] = (72 - (live_merged['thru']).fillna(0))
 live_merged['holes_remaining'] = np.where(live_merged['position']=='CUT',0,live_merged['holes_remaining']).astype('int')
