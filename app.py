@@ -87,7 +87,7 @@ matchup_num = st.sidebar.multiselect(                                   # matchu
 
 #####  MAKE TABLES AND CHARTS  #####
 
-
+#1 LIVE LEADERBOARD
 live_leaderboard = live_merged[['player', 'team', 'position', 'total', 'round', 'thru', 'matchup_num']].fillna(0).sort_values('total')
 live_leaderboard[['total', 'round', 'thru', 'matchup_num']] = live_leaderboard[['total', 'round', 'thru', 'matchup_num']].astype(int)
 
@@ -103,25 +103,21 @@ live_leaderboard = (
     .style.apply(highlight_rows, axis=1)
 )
 
-
-#1 LIVE LEADERBOARD
-# live_leaderboard = live_merged[['player','team','position','total','round','thru','matchup_num']].fillna(0).sort_values('total')
-# live_leaderboard[['total','round','thru','matchup_num']] = live_leaderboard[['total','round','thru','matchup_num']].astype('int')
-
-# live_leaderboard['total'] = np.where(live_leaderboard['total'] == 0, "E", live_leaderboard['total'])
-# live_leaderboard['round'] = np.where(live_leaderboard['round'] == 0, "E", live_leaderboard['round'])
-# live_leaderboard['position'] = np.where(live_leaderboard['position'] == "WAITING", "-", live_leaderboard['position'])
-# live_leaderboard['thru'] = np.where(live_leaderboard['thru'] == 0, "-", live_leaderboard['thru'])
-
-# live_board = live_leaderboard.copy()
-# live_leaderboard = live_leaderboard[live_leaderboard.matchup_num.isin(matchup_num)].rename(columns={'player':'Player','team':'Team','position':'Pos','total':'Total','round':'Round','thru':'Thru','matchup_num':'Matchup'}).style.apply(highlight_rows, axis=1)
-
 # 2 PLAYER HOLES REMAINING TABLE
-live_phr = live_merged[live_merged.matchup_num.isin(matchup_num)].groupby('team')[['total','holes_remaining']].sum().reset_index().rename(columns={'team':'Team','total':'Total','holes_remaining':'PHR','matchup_num':'Matchup'})
-live_phr = live_phr.sort_values(by='Total')
-live_phr['Total'] = np.where(live_phr['Total'] == 0, "E", live_phr['Total'])
-live_phr['PHR'] = np.where(live_phr['PHR'] == 0, "0", live_phr['PHR'])
-live_phr = (live_phr.style.apply(highlight_rows, axis=1))
+
+# Group by 'team' and calculate the sum of 'total' and 'holes_remaining' for each team
+live_phr = live_merged[live_merged.matchup_num.isin(matchup_num)].groupby('team').agg({'total': 'sum', 'holes_remaining': 'sum'}).reset_index()
+live_phr.rename(columns={'team': 'Team', 'total': 'Total', 'holes_remaining': 'PHR'}, inplace=True)
+live_phr.sort_values(by='Total', inplace=True)
+live_phr['Total'] = live_phr['Total'].replace(0, 'E')
+live_phr['PHR'] = live_phr['PHR'].replace(0, '0')
+live_phr = live_phr.style.apply(highlight_rows, axis=1)
+
+# live_phr = live_merged[live_merged.matchup_num.isin(matchup_num)].groupby('team')[['total','holes_remaining']].sum().reset_index().rename(columns={'team':'Team','total':'Total','holes_remaining':'PHR','matchup_num':'Matchup'})
+# live_phr = live_phr.sort_values(by='Total')
+# live_phr['Total'] = np.where(live_phr['Total'] == 0, "E", live_phr['Total'])
+# live_phr['PHR'] = np.where(live_phr['PHR'] == 0, "0", live_phr['PHR'])
+# live_phr = (live_phr.style.apply(highlight_rows, axis=1))
 
 # 3 THRU CUT BAR
 thru_cut_df = live_board[(live_board.position!='CUT') & (live_board.position!='WD') & (live_board.matchup_num.isin(matchup_num))]['team'].value_counts()
