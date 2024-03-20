@@ -63,7 +63,7 @@ teams['team'] = teams.team.map(teams_dict)
 teams = teams.loc[teams.active_reserve=='Active'].set_index('player')
 
 
-##### MERGE FANTRAX ACTIVE ROSTERS WITH DATAGOLF LIVE SCORING #####
+#####  MERGE FANTRAX ACTIVE ROSTERS WITH DATAGOLF LIVE SCORING  #####
 
 live_merged = pd.merge(teams, live, how='left', left_index=True, right_index=True).fillna(0).sort_values('total')
 live_merged['holes_remaining'] = (72 - (live_merged['thru']).fillna(0))
@@ -71,7 +71,9 @@ live_merged['holes_remaining'] = np.where(live_merged['position']=='CUT',0,live_
 live_merged['holes_remaining'] = np.where(live_merged['position']=='WD',0,live_merged['holes_remaining']).astype('int')
 live_merged['matchup_num'] = live_merged.team.map(matchups)
 
-# SIDEBAR
+
+#####  SIDEBAR  #####
+
 sidebar_title = st.sidebar.empty()                                      # placeholder - title
 st.sidebar.markdown("---")
 sidebar_phr_table = st.sidebar.empty()                                  # placeholder - phr table
@@ -82,17 +84,37 @@ matchup_num = st.sidebar.multiselect(                                   # matchu
     default=sorted(np.array(live_merged['matchup_num'].unique())),
 )
 
-#1 LIVE LEADERBOARD
-live_leaderboard = live_merged[['player','team','position','total','round','thru','matchup_num']].fillna(0).sort_values('total')
-live_leaderboard[['total','round','thru','matchup_num']] = live_leaderboard[['total','round','thru','matchup_num']].astype('int')
 
-live_leaderboard['total'] = np.where(live_leaderboard['total'] == 0, "E", live_leaderboard['total'])
-live_leaderboard['round'] = np.where(live_leaderboard['round'] == 0, "E", live_leaderboard['round'])
+#####  MAKE TABLES AND CHARTS  #####
+
+
+live_leaderboard = live_merged[['player', 'team', 'position', 'total', 'round', 'thru', 'matchup_num']].fillna(0).sort_values('total')
+live_leaderboard[['total', 'round', 'thru', 'matchup_num']] = live_leaderboard[['total', 'round', 'thru', 'matchup_num']].astype(int)
+
+live_leaderboard['total'] = np.where(live_leaderboard['total'] == 0, "E", live_leaderboard['total']).astype(str)
+live_leaderboard['round'] = np.where(live_leaderboard['round'] == 0, "E", live_leaderboard['round']).astype(str)
 live_leaderboard['position'] = np.where(live_leaderboard['position'] == "WAITING", "-", live_leaderboard['position'])
-live_leaderboard['thru'] = np.where(live_leaderboard['thru'] == 0, "-", live_leaderboard['thru'])
+live_leaderboard['thru'] = np.where(live_leaderboard['thru'] == 0, "-", live_leaderboard['thru']).astype(str)
 
 live_board = live_leaderboard.copy()
-live_leaderboard = live_leaderboard[live_leaderboard.matchup_num.isin(matchup_num)].rename(columns={'player':'Player','team':'Team','position':'Pos','total':'Total','round':'Round','thru':'Thru','matchup_num':'Matchup'}).style.apply(highlight_rows, axis=1)
+live_leaderboard = (
+    live_leaderboard[live_leaderboard.matchup_num.isin(matchup_num)]
+    .rename(columns={'player': 'Player', 'team': 'Team', 'position': 'Pos', 'total': 'Total', 'round': 'Round', 'thru': 'Thru', 'matchup_num': 'Matchup'})
+    .style.apply(highlight_rows, axis=1)
+)
+
+
+#1 LIVE LEADERBOARD
+# live_leaderboard = live_merged[['player','team','position','total','round','thru','matchup_num']].fillna(0).sort_values('total')
+# live_leaderboard[['total','round','thru','matchup_num']] = live_leaderboard[['total','round','thru','matchup_num']].astype('int')
+
+# live_leaderboard['total'] = np.where(live_leaderboard['total'] == 0, "E", live_leaderboard['total'])
+# live_leaderboard['round'] = np.where(live_leaderboard['round'] == 0, "E", live_leaderboard['round'])
+# live_leaderboard['position'] = np.where(live_leaderboard['position'] == "WAITING", "-", live_leaderboard['position'])
+# live_leaderboard['thru'] = np.where(live_leaderboard['thru'] == 0, "-", live_leaderboard['thru'])
+
+# live_board = live_leaderboard.copy()
+# live_leaderboard = live_leaderboard[live_leaderboard.matchup_num.isin(matchup_num)].rename(columns={'player':'Player','team':'Team','position':'Pos','total':'Total','round':'Round','thru':'Thru','matchup_num':'Matchup'}).style.apply(highlight_rows, axis=1)
 
 # 2 PLAYER HOLES REMAINING TABLE
 live_phr = live_merged[live_merged.matchup_num.isin(matchup_num)].groupby('team')[['total','holes_remaining']].sum().reset_index().rename(columns={'team':'Team','total':'Total','holes_remaining':'PHR','matchup_num':'Matchup'})
