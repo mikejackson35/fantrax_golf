@@ -72,7 +72,6 @@ live_merged['holes_remaining'] = np.where(live_merged['position']=='CUT',0,live_
 live_merged['holes_remaining'] = np.where(live_merged['position']=='WD',0,live_merged['holes_remaining']).astype('int')
 live_merged['matchup_num'] = live_merged.team.map(matchups)
 
-st.markdown(" ")
 #####  SIDEBAR  #####
 
 sidebar_title = st.sidebar.empty()                                      # placeholder - title
@@ -144,6 +143,7 @@ live_sg = live_sg.style.background_gradient(cmap='Greens').format(precision=2)
 
 #################
 ### MAIN PAGE ###
+st.write("")
 st.markdown("<h3 style='text-align: center;;'>Live Leaderboard</h3>", unsafe_allow_html=True)
 with st.expander('Strokes Gained by Team'):
     st.dataframe(live_sg,height=330,hide_index=True,use_container_width=True)
