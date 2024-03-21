@@ -14,8 +14,8 @@ with open(r"styles/main.css") as f:                                             
     st.markdown("<style>{}</style>".format(f.read()), unsafe_allow_html=True)    
 config = {'displayModeBar': False}                                                                    # plotly
 
-dg_key = st.secrets.dg_key                                                                            # api keys
-
+# dg_key = st.secrets.dg_key                                                                            # api keys
+dg_key = "e297e933c3ad47d71ec1626c299e"
 
 ##### GET LIVE GOLF DATA - prep and clean #####
 
@@ -66,6 +66,7 @@ teams = teams.loc[teams.active_reserve=='Active'].set_index('player')
 #####  MERGE FANTRAX ACTIVE ROSTERS WITH DATAGOLF LIVE SCORING  #####
 
 live_merged = pd.merge(teams, live, how='left', left_index=True, right_index=True).fillna(0).sort_values('total')
+live_merged = live_merged[live_merged.player != 0]
 live_merged['holes_remaining'] = (72 - (live_merged['thru']).fillna(0))
 live_merged['holes_remaining'] = np.where(live_merged['position']=='CUT',0,live_merged['holes_remaining']).astype('int')
 live_merged['holes_remaining'] = np.where(live_merged['position']=='WD',0,live_merged['holes_remaining']).astype('int')
@@ -96,6 +97,8 @@ live_leaderboard['round'] = np.where(live_leaderboard['round'] == 0, "E", live_l
 live_leaderboard['position'] = np.where(live_leaderboard['position'] == "WAITING", "-", live_leaderboard['position'])
 live_leaderboard['thru'] = np.where(live_leaderboard['thru'] == 0, "-", live_leaderboard['thru']).astype(str)
 
+live_leaderboard = live_leaderboard[live_leaderboard.player != 0]
+
 live_board = live_leaderboard.copy()
 live_leaderboard = (
     live_leaderboard[live_leaderboard.matchup_num.isin(matchup_num)]
@@ -104,11 +107,12 @@ live_leaderboard = (
 )
 
 # 2 PLAYER HOLES REMAINING TABLE
-live_phr = live_merged[live_merged.matchup_num.isin(matchup_num)].groupby('team').agg({'total': 'sum', 'holes_remaining': 'sum'}).reset_index()
-live_phr.rename(columns={'team': 'Team', 'total': 'Total', 'holes_remaining': 'PHR'}, inplace=True)
+live_phr = live_merged[live_merged.matchup_num.isin(matchup_num)].groupby('team').agg({'total': 'sum', 'holes_remaining': 'sum', 'matchup_num':'mean'}).reset_index()
+live_phr.rename(columns={'team': 'Team', 'total': 'Total', 'holes_remaining': 'PHR', 'matchup_num':'Matchup'}, inplace=True)
 live_phr.sort_values(by='Total', inplace=True)
-live_phr['Total'] = live_phr['Total'].replace(0, 'E')
-live_phr['PHR'] = live_phr['PHR'].replace(0, '0')
+live_phr['Total'] = live_phr['Total'].replace(0, 'E').astype(int).astype(str)
+live_phr['PHR'] = live_phr['PHR'].replace(0, '0').astype(str)
+live_phr['Matchup'] = live_phr['Matchup'].astype(int).astype(str)
 live_phr = live_phr.style.apply(highlight_rows, axis=1)
 
 # 3 THRU CUT BAR
