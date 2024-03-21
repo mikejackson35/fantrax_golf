@@ -72,7 +72,7 @@ live_merged['holes_remaining'] = np.where(live_merged['position']=='CUT',0,live_
 live_merged['holes_remaining'] = np.where(live_merged['position']=='WD',0,live_merged['holes_remaining']).astype('int')
 live_merged['matchup_num'] = live_merged.team.map(matchups)
 
-
+st.markdown(" ")
 #####  SIDEBAR  #####
 
 sidebar_title = st.sidebar.empty()                                      # placeholder - title
