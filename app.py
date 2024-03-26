@@ -77,7 +77,7 @@ live_merged['matchup_num'] = live_merged.team.map(matchups)
 sidebar_title = st.sidebar.empty()                                      # placeholder - title
 st.sidebar.markdown("---")
 sidebar_phr_table = st.sidebar.empty()                                  # placeholder - phr table
-# sidebar_thru_cut_bar = st.sidebar.empty()                               # placeholder - thru cut bar
+sidebar_thru_cut_bar = st.sidebar.empty()                               # placeholder - thru cut bar
 matchup_num = st.sidebar.multiselect(                                   # matchup filter
     label='Matchup',
     options=sorted(np.array(live_merged['matchup_num'].unique())),
