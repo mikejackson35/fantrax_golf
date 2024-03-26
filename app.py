@@ -14,8 +14,8 @@ with open(r"styles/main.css") as f:                                             
     st.markdown("<style>{}</style>".format(f.read()), unsafe_allow_html=True)    
 config = {'displayModeBar': False}                                                                    # plotly
 
-# dg_key = st.secrets.dg_key                                                                            # api keys
-dg_key = "e297e933c3ad47d71ec1626c299e"
+dg_key = st.secrets.dg_key                                                                            # api keys
+
 
 ##### GET LIVE GOLF DATA - prep and clean #####
 
@@ -48,17 +48,17 @@ teams = get_fantrax()
 
 matchups = {                                    # enter weekly matchups here
     'unit_circle':1,
-    'Putt Pirates':1,
-    'AlphaWired':2,
-    'txmoonshine':2,
-    'Sneads Foot':3,
-    'New Team 4':3,
-    'Team Gamble':4,
-    'Philly919':4
+    'Putt Pirates':2,
+    'AlphaWired':3,
+    'txmoonshine':4,
+    'Sneads Foot':2,
+    'New Team 4':4,
+    'Team Gamble':3,
+    'Philly919':1
 }
 
 teams.columns = ['player','team','active_reserve']
-# teams_dict = {'919':'Philly919','u_c':'unit_circle','NT 4':'New Team 4','NT 8':'Sneads Foot','txms':'txmoonshine','MG':'Team Gamble','grrr':'Putt Pirates','[AW]':'AlphaWired'}
+teams_dict = {'919':'Philly919','u_c':'unit_circle','NT 4':'New Team 4','NT 8':'Sneads Foot','txms':'txmoonshine','MG':'Team Gamble','grrr':'Putt Pirates','[AW]':'AlphaWired'}
 teams['team'] = teams.team.map(teams_dict)
 teams = teams.loc[teams.active_reserve=='Active'].set_index('player')
 
@@ -67,7 +67,7 @@ teams = teams.loc[teams.active_reserve=='Active'].set_index('player')
 
 live_merged = pd.merge(teams, live, how='left', left_index=True, right_index=True).fillna(0).sort_values('total')
 live_merged = live_merged[live_merged.player != 0]
-live_merged['holes_remaining'] = (18 - (live_merged['thru']).fillna(0))
+live_merged['holes_remaining'] = (72 - (live_merged['thru']).fillna(0))
 live_merged['holes_remaining'] = np.where(live_merged['position']=='CUT',0,live_merged['holes_remaining']).astype('int')
 live_merged['holes_remaining'] = np.where(live_merged['position']=='WD',0,live_merged['holes_remaining']).astype('int')
 live_merged['matchup_num'] = live_merged.team.map(matchups)
@@ -150,6 +150,6 @@ with st.expander('Strokes Gained by Team'):
 st.dataframe(live_leaderboard,hide_index=True,height=1750,use_container_width=True, column_config={"Team": None, "Matchup":None})
 
 ### SIDEBAR ###
-sidebar_title.markdown("<h2 style='text-align: center;'>Valspar<br>Championship<br><small>Week 11</small></h2>", unsafe_allow_html=True)
+sidebar_title.markdown("<h2 style='text-align: center;'>Texas Children's<br>Houston Open<br><small>Week 12</small></h2>", unsafe_allow_html=True)
 sidebar_thru_cut_bar.plotly_chart(thru_cut_bar, use_container_width=True,config = config)
 sidebar_phr_table.dataframe(live_phr,hide_index=True,use_container_width=True)
