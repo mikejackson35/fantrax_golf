@@ -68,7 +68,7 @@ teams = teams.loc[teams.active_reserve=='Active'].set_index('player')
 
 live_merged = pd.merge(teams, live, how='left', left_index=True, right_index=True).fillna(0).sort_values('total')
 live_merged = live_merged[live_merged.player != 0]
-live_merged['holes_remaining'] = (72 - (live_merged['thru']).fillna(0))
+live_merged['holes_remaining'] = (54 - (live_merged['thru']).fillna(0))
 live_merged['holes_remaining'] = np.where(live_merged['position']=='CUT',0,live_merged['holes_remaining']).astype('int')
 live_merged['holes_remaining'] = np.where(live_merged['position']=='WD',0,live_merged['holes_remaining']).astype('int')
 live_merged['matchup_num'] = live_merged.team.map(matchups)
@@ -118,7 +118,7 @@ live_phr = live_merged[live_merged.matchup_num.isin(matchup_num)].groupby('team'
 inside_cut_df = get_inside_cut(live_board)
 live_phr = live_phr.merge(inside_cut_df, how='left', on='team')
 
-live_phr.rename(columns={'team': 'Team', 'total': 'Total', 'holes_remaining': 'PHR','inside_cut':'Players Inside Cut'}, inplace=True)
+live_phr.rename(columns={'team': 'Team', 'total': 'Total', 'holes_remaining': 'PHR','inside_cut':'Inside Cut'}, inplace=True)
 live_phr.sort_values(by='Total', inplace=True)
 live_phr['Total'] = live_phr['Total'].astype(int)
 live_phr['Total'] = live_phr['Total'].replace(0, 'E').astype(str)
