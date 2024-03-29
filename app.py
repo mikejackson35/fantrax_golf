@@ -123,7 +123,7 @@ live_phr.sort_values(by='Total', inplace=True)
 live_phr['Total'] = live_phr['Total'].astype(int)
 live_phr['Total'] = live_phr['Total'].replace(0, 'E').astype(str)
 live_phr['PHR'] = live_phr['PHR'].replace(0, '0').astype(str)
-live_phr['Players Inside Cut'] = live_phr['Players Inside Cut'].astype(int).astype(str)
+live_phr['Inside Cut'] = live_phr['Inside Cut'].astype(int).astype(str)
 live_phr = live_phr.style.apply(highlight_rows, axis=1)
 
 # 3 THRU CUT BAR
