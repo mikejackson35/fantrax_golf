@@ -163,7 +163,7 @@ inside_cut_bar = px.bar(
     template='plotly_dark',
     color='team',
     color_discrete_map=team_color,
-    labels = {'team':'Player Inside Cutline','inside_cut':''},
+    labels = {'team':'Inside Cutline','inside_cut':''},
     # title = 'Players Inside Cutline',
     height = 200,
     log_y=True).update_traces(marker_color='grey')
