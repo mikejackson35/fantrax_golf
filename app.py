@@ -115,15 +115,16 @@ live_leaderboard = (
 # 2 PLAYER HOLES REMAINING TABLE
 live_phr = live_merged[live_merged.matchup_num.isin(matchup_num)].groupby('team').agg({'total': 'sum', 'holes_remaining': 'sum'}).reset_index()
 
-inside_cut_df = get_inside_cut(live_board)
-live_phr = live_phr.merge(inside_cut_df, how='left', on='team')
+# inside_cut_df = get_inside_cut(live_board)
+# live_phr = live_phr.merge(inside_cut_df, how='left', on='team')
 
-live_phr.rename(columns={'team': 'Team', 'total': 'Total', 'holes_remaining': 'PHR','inside_cut':'Inside Cut'}, inplace=True)
+live_phr.rename(columns={'team': 'Team', 'total': 'Total', 'holes_remaining': 'PHR'}, inplace=True)
+# live_phr.rename(columns={'team': 'Team', 'total': 'Total', 'holes_remaining': 'PHR','inside_cut':'Inside Cut'}, inplace=True)
 live_phr.sort_values(by='Total', inplace=True)
 live_phr['Total'] = live_phr['Total'].astype(int)
 live_phr['Total'] = live_phr['Total'].replace(0, 'E').astype(str)
 live_phr['PHR'] = live_phr['PHR'].replace(0, '0').astype(str)
-live_phr['Inside Cut'] = live_phr['Inside Cut'].astype(int).astype(str)
+# live_phr['Inside Cut'] = live_phr['Inside Cut'].astype(int).astype(str)
 live_phr = live_phr.style.apply(highlight_rows, axis=1)
 
 # 3 THRU CUT BAR
@@ -153,35 +154,36 @@ live_sg.columns = ['Team','SG Putt','SG Arg','SG App','SG T2G']
 live_sg = live_sg.style.background_gradient(cmap='Greens').format(precision=2)
 
 # 5  CURRENT PLAYERS INSIDE CUT BAR
-inside_cut_df = get_inside_cut(live_board)
+# inside_cut_df = get_inside_cut(live_board)
 
-inside_cut_bar = px.bar(
-    inside_cut_df,
-    x='team',
-    y='inside_cut',
-    text_auto=True,
-    template='plotly_dark',
-    color='team',
-    color_discrete_map=team_color,
-    labels = {'team':'Inside Cutline','inside_cut':''},
-    # title = 'Players Inside Cutline',
-    height = 200,
-    log_y=True).update_traces(marker_color='grey')
-# ).update_xaxes(showticklabels=False,showgrid=False
-# ).update_yaxes(showticklabels=False,showgrid=False
-# ).update_layout(showlegend=False,title_x=.25)
+# inside_cut_bar = px.bar(
+#     inside_cut_df,
+#     x='team',
+#     y='inside_cut',
+#     text_auto=True,
+#     template='plotly_dark',
+#     color='team',
+#     color_discrete_map=team_color,
+#     labels = {'team':'Inside Cutline','inside_cut':''},
+#     # title = 'Players Inside Cutline',
+#     height = 200,
+#     log_y=True).update_traces(marker_color='grey')
+# # ).update_xaxes(showticklabels=False,showgrid=False
+# # ).update_yaxes(showticklabels=False,showgrid=False
+# # ).update_layout(showlegend=False,title_x=.25)
 
-inside_cut_bar.update_layout(
-    showlegend=False,
-    xaxis=dict(showticklabels=False,showgrid=False, tickfont=dict(color='#5A5856', size=13), title_font=dict(color='#5A5856', size=15)),
-    yaxis=dict(showticklabels=False, showgrid=False, tickfont=dict(color='#5A5856', size=13), title_font=dict(color='#5A5856', size=15)),
-)
+# inside_cut_bar.update_layout(
+#     showlegend=False,
+#     xaxis=dict(showticklabels=False,showgrid=False, tickfont=dict(color='#5A5856', size=13), title_font=dict(color='#5A5856', size=15)),
+#     yaxis=dict(showticklabels=False, showgrid=False, tickfont=dict(color='#5A5856', size=13), title_font=dict(color='#5A5856', size=15)),
+# )
 
 
 
 #################
 ### MAIN PAGE ###
 # st.write("")
+st.plotly_chart(thru_cut_bar,use_container_width=True,config=config)
 st.markdown("<h3 style='text-align: center;;'>Live Leaderboard</h3>", unsafe_allow_html=True)
 with st.expander('Strokes Gained by Team'):
     st.dataframe(live_sg,height=330,hide_index=True,use_container_width=True)
@@ -189,5 +191,5 @@ st.dataframe(live_leaderboard,hide_index=True,height=1750,use_container_width=Tr
 
 ### SIDEBAR ###
 sidebar_title.markdown("<h2 style='text-align: center;'>Texas Children's<br>Houston Open<br><small>Week 12</small></h2>", unsafe_allow_html=True)
-# side_bar_inside_cut.plotly_chart(inside_cut_bar,use_container_width=True,config=config)
+# sidebar_thru_cut_bar.plotly_chart(thru_cut_bar,use_container_width=True,config=config)
 sidebar_phr_table.dataframe(live_phr,hide_index=True,use_container_width=True)
