@@ -14,8 +14,8 @@ with open(r"styles/main.css") as f:                                             
     st.markdown("<style>{}</style>".format(f.read()), unsafe_allow_html=True)    
 config = {'displayModeBar': False}                                                                    # plotly
 
-dg_key = st.secrets.dg_key                                                                           # api keys
-
+# dg_key = st.secrets.dg_key                                                                         # api keys
+dg_key = "e297e933c3ad47d71ec1626c299e"
 
 ##### GET LIVE GOLF DATA - prep and clean #####
 
@@ -50,11 +50,11 @@ matchups = {                                    # enter weekly matchups here
     'unit_circle':1,
     'Putt Pirates':2,
     'AlphaWired':3,
-    'txmoonshine':4,
-    'Sneads Foot':2,
+    'txmoonshine':2,
+    'Sneads Foot':1,
     'New Team 4':4,
-    'Team Gamble':3,
-    'Philly919':1
+    'Team Gamble':4,
+    'Philly919':3
 }
 
 teams.columns = ['player','team','active_reserve']
@@ -67,7 +67,7 @@ teams = teams.loc[teams.active_reserve=='Active'].set_index('player')
 
 live_merged = pd.merge(teams, live, how='left', left_index=True, right_index=True).fillna(0).sort_values('total')
 live_merged = live_merged[live_merged.player != 0]
-live_merged['holes_remaining'] = (18 - (live_merged['thru']).fillna(0))
+live_merged['holes_remaining'] = (72 - (live_merged['thru']).fillna(0))
 live_merged['holes_remaining'] = np.where(live_merged['position']=='CUT',0,live_merged['holes_remaining']).astype('int')
 live_merged['holes_remaining'] = np.where(live_merged['position']=='WD',0,live_merged['holes_remaining']).astype('int')
 live_merged['matchup_num'] = live_merged.team.map(matchups)
@@ -114,16 +114,16 @@ live_leaderboard = (
 # 2 PLAYER HOLES REMAINING TABLE
 live_phr = live_merged[live_merged.matchup_num.isin(matchup_num)].groupby('team').agg({'total': 'sum', 'holes_remaining': 'sum'}).reset_index()
 
-# inside_cut_df = get_inside_cut(live_board)
-# live_phr = live_phr.merge(inside_cut_df, how='left', on='team')
+inside_cut_df = get_inside_cut(live_board)
+live_phr = live_phr.merge(inside_cut_df, how='left', on='team')
 
 live_phr.rename(columns={'team': 'Team', 'total': 'Total', 'holes_remaining': 'PHR'}, inplace=True)
-# live_phr.rename(columns={'team': 'Team', 'total': 'Total', 'holes_remaining': 'PHR','inside_cut':'Inside Cut'}, inplace=True)
+live_phr.rename(columns={'team': 'Team', 'total': 'Total', 'holes_remaining': 'PHR','inside_cut':'Inside Cut'}, inplace=True)
 live_phr.sort_values(by='Total', inplace=True)
 live_phr['Total'] = live_phr['Total'].astype(int)
 live_phr['Total'] = live_phr['Total'].replace(0, 'E').astype(str)
 live_phr['PHR'] = live_phr['PHR'].replace(0, '0').astype(str)
-# live_phr['Inside Cut'] = live_phr['Inside Cut'].astype(int).astype(str)
+live_phr['Inside Cut'] = live_phr['Inside Cut'].astype(int).astype(str)
 live_phr = live_phr.style.apply(highlight_rows, axis=1)
 
 # 3 THRU CUT BAR
@@ -182,13 +182,13 @@ live_sg = live_sg.style.background_gradient(cmap='Greens').format(precision=2)
 #################
 ### MAIN PAGE ###
 # st.write("")
-st.plotly_chart(thru_cut_bar,use_container_width=True,config=config)
+# st.plotly_chart(thru_cut_bar,use_container_width=True,config=config)
 st.markdown("<h3 style='text-align: center;;'>Live Leaderboard</h3>", unsafe_allow_html=True)
 with st.expander('Strokes Gained by Team'):
     st.dataframe(live_sg,height=330,hide_index=True,use_container_width=True)
 st.dataframe(live_leaderboard,hide_index=True,height=1750,use_container_width=True, column_config={"Team": None, "Matchup":None})
 
 ### SIDEBAR ###
-sidebar_title.markdown("<h2 style='text-align: center;'>Texas Children's<br>Houston Open<br><small>Week 12</small></h2>", unsafe_allow_html=True)
+sidebar_title.markdown("<h2 style='text-align: center;'>The Valero<br>Texas Open<br><br><small>Week 13</small></h2>", unsafe_allow_html=True)
 # sidebar_thru_cut_bar.plotly_chart(thru_cut_bar,use_container_width=True,config=config)
 sidebar_phr_table.dataframe(live_phr,hide_index=True,use_container_width=True)
