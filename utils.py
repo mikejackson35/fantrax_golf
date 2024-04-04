@@ -48,19 +48,19 @@ stats_dict = {
 def highlight_rows(row):
     value = row.loc['Team']
     if value == 'unit_circle':
-        color = '#c28bdd' # Pink
+        color = '#c28bdd' # Purple
     elif value == 'Philly919':
-        color = '#0ec3d2' # Purple
+        color = '#0ec3d2' # Aqua
     elif value == 'AlphaWired':
-        color = '#f7a05d' # Blue
+        color = '#f7a05d' # Orange
     elif value == 'Sneads Foot':
-        color = '#46d671' # Gold
+        color = '#46d671' # Green
     elif value == 'New Team 4':
-        color = '#f75e38' # Magenta
+        color = '#f75e38' # Red
     elif value == 'Team Gamble':
-        color = '#2693be' # Orange
+        color = '#2693be' # Navy
     elif value == 'txmoonshine':
-        color = '#dbc530' # Aqua
+        color = '#dbc530' # Yellow
     else:
         color = '#73706a' # Grey
     return ['background-color: {}'.format(color) for r in row]
@@ -68,19 +68,19 @@ def highlight_rows(row):
 def highlight_cols(col):
 
     if col.team == 'unit_circle':
-        color = '#FF99FF' # Pink
+        color = '#FF99FF' # Purple
     elif col.team == 'Philly919':
-        color = '#7f3c8d' # Purple
+        color = '#7f3c8d' # Aqua
     elif col.team == 'AlphaWired':
-        color = '#3969ac' # Blue
+        color = '#3969ac' # Orange
     elif col.team == 'Sneads Foot':
-        color = '#f2b701' # Gold
+        color = '#f2b701' # Green
     elif col.team == 'New Team 4':
-        color = '#FF6666' # Magenta
+        color = '#FF6666' # Red
     elif col.team == 'Team Gamble':
-        color = '#e68310' # Orange
+        color = '#e68310' # Navy
     elif col.team == 'txmoonshine':
-        color = '#00868b' # Aqua
+        color = '#00868b' # Yellow
     else:
         color = '#a5aa99' # Grey
     return ['background-color: {}'.format(color) for c in col]
@@ -126,7 +126,29 @@ def get_inside_cut(live_merged):
     """
     live_merged = live_merged[live_merged['position'] != "WAITING"]
     live_merged = remove_T_from_positions(live_merged)
-    inside_cut_df = pd.DataFrame(live_merged[live_merged['position'] < "66"].team.value_counts()).reset_index()
+    live_merged['position'] = live_merged['position'].astype('int')
+    inside_cut_df = pd.DataFrame(live_merged[live_merged['position'] < 66].team.value_counts()).reset_index()
     inside_cut_df.columns = ['team','inside_cut']
-    return inside_cut_df
+    
+    inside_cut_dict = dict(inside_cut_df.values)
+    return inside_cut_dict
+
+def fix_names(dg_live):
+    """
+    Takes in live datagolf scoring, cleans names, outputs list of active players this week
+    """
+    names = dg_live['player'].str.split(expand=True)                  
+    names[0] = names[0].str.rstrip(",")
+    names[1] = names[1].str.rstrip(",")
+    names['player'] = names[1] + " " + names[0]
+
+    names['player'] = np.where(names['player']=='Matt Fitzpatrick', 'Matthew Fitzpatrick', names['player'])
+    names['player'] = np.where(names['player']=='Si Kim', 'Si Woo Kim', names['player'])
+    names['player'] = np.where(names['player']=='Min Lee', 'Min Woo Lee', names['player'])
+    names['player'] = np.where(names['player']=='Byeong An', 'Byeong Hun An', names['player'])
+    names['player'] = np.where(names['player']=='Rooyen Van', 'Erik Van Rooyen', names['player'])
+    names['player'] = np.where(names['player']=='Vince Whaley', 'Vincent Whaley', names['player'])
+    names['player'] = np.where(names['player']=='Kevin Yu', 'kevin Yu', names['player'])
+    names['player'] = np.where(names['player']=='Kyounghoon Lee', 'Kyoung-Hoon Lee', names['player'])
+    return names.player
 

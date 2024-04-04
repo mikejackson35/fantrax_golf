@@ -3,7 +3,7 @@ import numpy as np
 import plotly.express as px
 import streamlit as st
 import altair as alt
-from utils import highlight_rows, teams_dict, get_inside_cut, remove_T_from_positions, team_color
+from utils import highlight_rows, teams_dict, get_inside_cut, remove_T_from_positions, team_color,fix_names
 # import secrets
 
 ##### LIBRARY CONFIGs AND SECRETS KEYS #####
@@ -17,35 +17,6 @@ config = {'displayModeBar': False}                                              
 # dg_key = st.secrets.dg_key                                                                         # api keys
 dg_key = "e297e933c3ad47d71ec1626c299e"
 
-##### GET LIVE GOLF DATA - prep and clean #####
-
-st.cache_data()
-def get_projections():
-    live = pd.read_csv(f"https://feeds.datagolf.com/preds/live-tournament-stats?stats=sg_putt,sg_arg,sg_app,sg_ott,sg_t2g,sg_bs,sg_total,distance,accuracy,gir,prox_fw,prox_rgh,scrambling&round=event_avg&display=value&file_format=csv&key={dg_key}")
-    return live
-live = get_projections()
-live.rename(columns={'player_name':'player'},inplace=True)
-
-names = live['player'].str.split(expand=True)                                                           # reverse last/first name
-names[0] = names[0].str.rstrip(",")                                                                   
-names[1] = names[1].str.rstrip(",")
-names['player'] = names[1] + " " + names[0]
-names['player'] = np.where(names['player']=='Si Kim', 'Si Woo Kim', names['player'])                    #fix player names to match fantrax
-names['player'] = np.where(names['player']=='Min Lee', 'Min Woo Lee', names['player'])
-names['player'] = np.where(names['player']=='Matt Fitzpatrick', 'Matthew Fitzpatrick', names['player'])
-names['player'] = np.where(names['player']=='Byeong An', 'Byeong Hun An', names['player'])
-names['player'] = np.where(names['player']=='Rooyen Van', 'Erik Van Rooyen', names['player'])
-live = live.set_index(names.player)
-
-
-##### GET FANTRAX ACTIVE ROSTERS - prep and clean #####
-
-st.cache_data()
-def get_fantrax():
-    teams = pd.read_csv(r"fantrax.csv",usecols=['Player','Status','Roster Status'])
-    return teams
-teams = get_fantrax()
-
 matchups = {                                    # enter weekly matchups here
     'unit_circle':1,
     'Putt Pirates':2,
@@ -57,138 +28,149 @@ matchups = {                                    # enter weekly matchups here
     'Philly919':3
 }
 
+## LIVE SCORING API ##
+path = f"https://feeds.datagolf.com/preds/live-tournament-stats?stats=sg_putt,sg_arg,sg_app,sg_ott,sg_t2g,sg_bs,sg_total,distance,accuracy,gir,prox_fw,prox_rgh,scrambling&round=event_avg&display=value&file_format=csv&key={dg_key}"
+
+st.cache_data()
+def get_live():
+    live = round(pd.read_csv(path),2).rename(columns={'player_name':'player'})
+    return live
+live = get_live()
+live = live.set_index(fix_names(live))
+
+
+## CURRENT WEEK FANTASY ROSTERS & MATCHUPS ##
+st.cache_data()
+def get_fantrax():
+    teams = pd.read_csv(r"fantrax.csv",usecols=['Player','Status','Roster Status'])
+    return teams
+teams = get_fantrax()
+
 teams.columns = ['player','team','active_reserve']
-teams_dict = {'919':'Philly919','u_c':'unit_circle','NT 4':'New Team 4','NT 8':'Sneads Foot','txms':'txmoonshine','MG':'Team Gamble','grrr':'Putt Pirates','[AW]':'AlphaWired'}
 teams['team'] = teams.team.map(teams_dict)
 teams = teams.loc[teams.active_reserve=='Active'].set_index('player')
 
-
-#####  MERGE FANTRAX ACTIVE ROSTERS WITH DATAGOLF LIVE SCORING  #####
-
-live_merged = pd.merge(teams, live, how='left', left_index=True, right_index=True).fillna(0).sort_values('total')
-live_merged = live_merged[live_merged.player != 0]
-live_merged['holes_remaining'] = (72 - (live_merged['thru']).fillna(0))
+## MERGE & PROCESS ##
+# merge current fantasy teams and live scoring
+live_merged = pd.merge(teams, live, how='left', left_index=True, right_index=True)[['team','position','total','round','thru']].fillna(0).sort_values('total')
+live_merged = live_merged[live_merged.index != 0].reset_index()
+live_merged[['round', 'thru']] = live_merged[['round', 'thru']].astype(int)
+# add columns matchup_num & holes_remaining
+live_merged['matchup_num'] = live_merged.team.map(matchups)
+live_merged['holes_remaining'] = (72 - (live_merged['thru']).fillna(0)).astype(int)
 live_merged['holes_remaining'] = np.where(live_merged['position']=='CUT',0,live_merged['holes_remaining']).astype('int')
 live_merged['holes_remaining'] = np.where(live_merged['position']=='WD',0,live_merged['holes_remaining']).astype('int')
-live_merged['matchup_num'] = live_merged.team.map(matchups)
 
-#####  SIDEBAR  #####
-
-sidebar_title = st.sidebar.empty()                                      # placeholder - title
+## SIDEBAR ##
+# placeholder for team leaderboard
+st.sidebar.markdown("<center>Week 13</center>",unsafe_allow_html=True)
 st.sidebar.markdown("---")
-# side_bar_inside_cut = st.sidebar.empty()
-sidebar_phr_table = st.sidebar.empty()
-sidebar_thru_cut_bar = st.sidebar.empty()                               # placeholder - thru cut bar
-matchup_num = st.sidebar.multiselect(                                   # matchup filter
+sidebar_team_leaderboard = st.sidebar.empty()
+# matchup multi-select filter
+matchup_num = st.sidebar.multiselect(        
     label='Matchup',
     options=sorted(np.array(live_merged['matchup_num'].unique())),
     default=sorted(np.array(live_merged['matchup_num'].unique())),
 )
+# data filtered by user
+live_merged = live_merged[live_merged.matchup_num.isin(matchup_num)]
 
 
-#####  MAKE TABLES AND CHARTS  #####
-
-#1 LIVE LEADERBOARD
-live_leaderboard = live_merged[['player', 'team', 'position', 'total', 'round', 'thru', 'matchup_num']].fillna(0).sort_values('total')
-live_leaderboard[['total', 'round', 'thru', 'matchup_num']] = live_leaderboard[['total', 'round', 'thru', 'matchup_num']].astype(int)
-
-live_leaderboard['total'] = np.where(live_leaderboard['total'] == 0, "E", live_leaderboard['total']).astype(str)
-live_leaderboard['round'] = np.where(live_leaderboard['round'] == 0, "E", live_leaderboard['round']).astype(str)
-live_leaderboard['position'] = np.where(live_leaderboard['position'] == "WAITING", "-", live_leaderboard['position'])
-live_leaderboard['thru'] = np.where(live_leaderboard['thru'] == 0, "-", live_leaderboard['thru']).astype(str)
-
-live_leaderboard = live_leaderboard[live_leaderboard.player != 0]
-
-live_board = live_leaderboard.copy()
-live_board = (
-    live_leaderboard[live_leaderboard.matchup_num.isin(matchup_num)]
-    # .rename(columns={'player': 'Player', 'team': 'Team', 'position': 'Pos', 'total': 'Total', 'round': 'Round', 'thru': 'Thru', 'matchup_num': 'Matchup'})
+## TABLES & CHARTS ##
+# team leaderboard
+team_leaderboard = (
+    live_merged
+    [['team','total','holes_remaining','matchup_num']]
+    .groupby('team')
+    [['total','holes_remaining','matchup_num']]
+    .agg({'total':'sum','holes_remaining':'sum','matchup_num':'mean'})
+    .convert_dtypes()
 )
+team_leaderboard = team_leaderboard.sort_values('total').reset_index()
+team_leaderboard['team'] = team_leaderboard['team'].astype(str)
+team_leaderboard['inside_cut'] = team_leaderboard['team'].map(get_inside_cut(live_merged))
+team_leaderboard['total'] = np.where(team_leaderboard['total'] == 0, "E", team_leaderboard['total']).astype(str)
+team_leaderboard.columns = ['Team','Total','PHR','Matchup','Inside Cut']
+team_leaderboard_bar_df = team_leaderboard.copy()
+team_leaderboard = team_leaderboard.style.apply(highlight_rows,axis=1)
 
-live_leaderboard = (
-    live_leaderboard[live_leaderboard.matchup_num.isin(matchup_num)]
-    .rename(columns={'player': 'Player', 'team': 'Team', 'position': 'Pos', 'total': 'Total', 'round': 'Round', 'thru': 'Thru', 'matchup_num': 'Matchup'})
-    .style.apply(highlight_rows, axis=1)
-)
+# player leaderboard
+player_leaderboard = live_merged[['player', 'position', 'total', 'round', 'thru','team','matchup_num']].fillna(0)
+player_leaderboard['total'] = np.where(player_leaderboard['total'] == 0, "E", player_leaderboard['total']).astype(str)
+player_leaderboard['round'] = np.where(player_leaderboard['round'] == 0, "E", player_leaderboard['round']).astype(str)
+player_leaderboard['position'] = np.where(player_leaderboard['position'] == "WAITING", "-", player_leaderboard['position'])
+player_leaderboard['thru'] = np.where(player_leaderboard['thru'] == 0, "-", player_leaderboard['thru']).astype(str)
+player_leaderboard.columns = ['Player','Pos','Total','Rd','Thru','Team','Matchup']
+player_leaderboard = player_leaderboard.style.apply(highlight_rows,axis=1)
 
-# 2 PLAYER HOLES REMAINING TABLE
-live_phr = live_merged[live_merged.matchup_num.isin(matchup_num)].groupby('team').agg({'total': 'sum', 'holes_remaining': 'sum'}).reset_index()
+# live strokes gained expander
+live_merged_strokes_gained = (pd.merge(teams,live,how='left',left_index=True,right_index=True).drop(columns='player').reset_index())
+live_merged_strokes_gained = live_merged_strokes_gained.groupby('team',as_index=False)[['sg_putt','sg_arg','sg_app','sg_t2g']].sum().reset_index(drop=True)
+live_merged_strokes_gained.columns = ['Team','SG Putt','SG Arg','SG App','SG T2G']
+live_merged_strokes_gained = live_merged_strokes_gained.style.background_gradient(cmap='Greens').format(precision=2)
 
-inside_cut_df = get_inside_cut(live_board)
-live_phr = live_phr.merge(inside_cut_df, how='left', on='team')
+### MAIN PAGE ###
+# header
+st.markdown("<h3 style='text-align: center;;'>The Valero</h3>", unsafe_allow_html=True)                    
+st.markdown("<h5 style='text-align: center;;'>Live Leaderboard</h5>", unsafe_allow_html=True)
+# strokes gained expander
+with st.expander('Strokes Gained by Team'):                                                                   
+    st.dataframe(live_merged_strokes_gained,
+                 height=330,hide_index=True,use_container_width=True)
+# player leaderboard
+st.dataframe(player_leaderboard,                                                                                
+             hide_index=True,height=1750,use_container_width=True,
+             column_config={"Team": None, "Matchup":None})
 
-live_phr.rename(columns={'team': 'Team', 'total': 'Total', 'holes_remaining': 'PHR'}, inplace=True)
-live_phr.rename(columns={'team': 'Team', 'total': 'Total', 'holes_remaining': 'PHR','inside_cut':'Inside Cut'}, inplace=True)
-live_phr.sort_values(by='Total', inplace=True)
-live_phr['Total'] = live_phr['Total'].astype(int)
-live_phr['Total'] = live_phr['Total'].replace(0, 'E').astype(str)
-live_phr['PHR'] = live_phr['PHR'].replace(0, '0').astype(str)
-live_phr['Inside Cut'] = live_phr['Inside Cut'].astype(int).astype(str)
-live_phr = live_phr.style.apply(highlight_rows, axis=1)
+### SIDEBAR ###
+# team leaderboard
+sidebar_team_leaderboard.dataframe(team_leaderboard,                                                                   
+                            hide_index=True,use_container_width=True,column_config={"Matchup":None})
 
-# 3 THRU CUT BAR
-thru_cut_df = live_board[(live_board['position'].isin(['CUT', 'WD']) == False) & (live_board['matchup_num'].isin(matchup_num))]['team'].value_counts()
-thru_cut_bar = px.bar(
-    thru_cut_df,
-    template='presentation',
-    labels={'value': '', 'team': ''},
-    text_auto=True,
-    height=250,
-    log_y=True,
-    title='Players Thru Cut'
-)
 
-thru_cut_bar.update_layout(
-    showlegend=False,
-    title_x=.35,
-    xaxis=dict(showgrid=False, tickfont=dict(color='#5A5856', size=11), title_font=dict(color='#5A5856', size=15)),
-    yaxis=dict(showticklabels=False, showgrid=False)
-)
 
-thru_cut_bar.update_traces(marker_color='rgb(200,200,200)',marker_line_width=1.5, opacity=0.6)
 
-# 4 LIVE STROKES GAINED TABLE
-live_sg = live_merged.groupby('team',as_index=False)[['sg_putt','sg_arg','sg_app','sg_t2g']].sum().reset_index(drop=True)
-live_sg.columns = ['Team','SG Putt','SG Arg','SG App','SG T2G']
-live_sg = live_sg.style.background_gradient(cmap='Greens').format(precision=2)
 
-# 5  CURRENT PLAYERS INSIDE CUT BAR
-# inside_cut_df = get_inside_cut(live_board)
+## NOT IN USE ##
 
+# CURRENT PLAYERS INSIDE CUT BAR #
 # inside_cut_bar = px.bar(
-#     inside_cut_df,
-#     x='team',
-#     y='inside_cut',
+#     team_leaderboard_bar_df,
+#     x='Team',
+#     y='Inside Cut',
 #     text_auto=True,
 #     template='plotly_dark',
-#     color='team',
+#     color='Team',
 #     color_discrete_map=team_color,
-#     labels = {'team':'Inside Cutline','inside_cut':''},
+#     labels = {'Team':'Inside Cutline','Inside Cut':''},
 #     # title = 'Players Inside Cutline',
 #     height = 200,
 #     log_y=True).update_traces(marker_color='grey')
-# # ).update_xaxes(showticklabels=False,showgrid=False
-# # ).update_yaxes(showticklabels=False,showgrid=False
-# # ).update_layout(showlegend=False,title_x=.25)
 
 # inside_cut_bar.update_layout(
 #     showlegend=False,
-#     xaxis=dict(showticklabels=False,showgrid=False, tickfont=dict(color='#5A5856', size=13), title_font=dict(color='#5A5856', size=15)),
+#     xaxis=dict(showticklabels=True,showgrid=False, tickfont=dict(color='#5A5856', size=13), title_font=dict(color='#5A5856', size=15)),
 #     yaxis=dict(showticklabels=False, showgrid=False, tickfont=dict(color='#5A5856', size=13), title_font=dict(color='#5A5856', size=15)),
 # )
+# CURRENT PLAYERS INSIDE CUT BAR #
 
 
+# MADE THRU THE CUT BAR #
+# thru_cut_df = live_board[(live_board['position'].isin(['CUT', 'WD']) == False) & (live_board['matchup_num'].isin(matchup_num))]['team'].value_counts()
+# thru_cut_bar = px.bar(
+#     thru_cut_df,
+#     template='presentation',
+#     labels={'value': '', 'team': ''},
+#     text_auto=True,
+#     height=250,
+#     log_y=True,
+#     title='Players Thru Cut')
 
-#################
-### MAIN PAGE ###
-# st.write("")
-# st.plotly_chart(thru_cut_bar,use_container_width=True,config=config)
-st.markdown("<h3 style='text-align: center;;'>Live Leaderboard</h3>", unsafe_allow_html=True)
-with st.expander('Strokes Gained by Team'):
-    st.dataframe(live_sg,height=330,hide_index=True,use_container_width=True)
-st.dataframe(live_leaderboard,hide_index=True,height=1750,use_container_width=True, column_config={"Team": None, "Matchup":None})
+# thru_cut_bar.update_layout(
+#     showlegend=False,
+#     title_x=.35,
+#     xaxis=dict(showgrid=False, tickfont=dict(color='#5A5856', size=11), title_font=dict(color='#5A5856', size=15)),
+#     yaxis=dict(showticklabels=False, showgrid=False))
 
-### SIDEBAR ###
-sidebar_title.markdown("<h2 style='text-align: center;'>The Valero<br>Texas Open<br><br><small>Week 13</small></h2>", unsafe_allow_html=True)
-# sidebar_thru_cut_bar.plotly_chart(thru_cut_bar,use_container_width=True,config=config)
-sidebar_phr_table.dataframe(live_phr,hide_index=True,use_container_width=True)
+# thru_cut_bar.update_traces(marker_color='rgb(200,200,200)',marker_line_width=1.5, opacity=0.6)
+# MADE THRU THE CUT BAR #
