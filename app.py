@@ -59,9 +59,6 @@ live_merged[['total','round', 'thru']] = live_merged[['total','round', 'thru']].
 # add columns matchup_num & holes_remaining
 live_merged['matchup_num'] = live_merged.team.map(matchups)
 live_merged['holes_remaining'] = (54 - (live_merged['thru']).fillna(0)).astype(int)
-# live_merged['holes_remaining'] = np.where(live_merged['position']=='CUT',0,live_merged['holes_remaining']).astype('int')
-# live_merged['holes_remaining'] = np.where(live_merged['position']=='WD',0,live_merged['holes_remaining']).astype('int')
-
 live_merged.loc[live_merged['position'].isin(['CUT', 'WD']), 'holes_remaining'] = 0
 live_merged['holes_remaining'] = live_merged['holes_remaining'].astype(int)
 
@@ -86,25 +83,28 @@ with col2:
 # data filtered by multiselect
 live_merged = live_merged[live_merged.matchup_num.isin(matchup_num)]
 
-# make team leaderboard
-team_leaderboard = (
+# Make team leaderboard
+team_leaderboard = (live_merged[['team', 'team_short', 'total', 'holes_remaining', 'matchup_num']]
+                    .groupby(['team', 'team_short'])
+                    .agg({'total': 'sum', 'holes_remaining': 'sum'})
+                    .convert_dtypes()
+                    .sort_values('total')
+                    .reset_index()
+                    .astype({'team': str, 'team_short': str})
+                   )
 
-    live_merged
-    [['team','team_short','total','holes_remaining','matchup_num']]
-    .groupby(['team','team_short'])
-    [['total','holes_remaining']]
-    .agg({'total':'sum','holes_remaining':'sum'})
-    .convert_dtypes()
-)
-team_leaderboard = team_leaderboard.sort_values('total').reset_index()
-team_leaderboard['team'] = team_leaderboard['team'].astype(str)
-team_leaderboard['team_short'] = team_leaderboard['team_short'].astype(str)
 team_leaderboard['inside_cut'] = team_leaderboard['team'].map(get_inside_cut(live_merged))
+
+# Format 'total' column
 team_leaderboard['total'] = team_leaderboard['total'].apply(plus_prefix)
-team_leaderboard['total'] = np.where(team_leaderboard['total'] == 0, "E", team_leaderboard['total']).astype(str)
+team_leaderboard['total'] = team_leaderboard['total'].replace('0', 'E').astype(str)
+
+
+# team_leaderboard['total'] = team_leaderboard['total'].apply(plus_prefix)
+# team_leaderboard['total'] = np.where(team_leaderboard['total'] == 0, "E", team_leaderboard['total']).astype(str)
 team_leaderboard_bar_df = team_leaderboard.copy()
 team_leaderboard.drop(columns='team',inplace=True)
-team_leaderboard.rename(columns={'team_short':'team'})
+team_leaderboard.rename(columns={'team_short':'team'},inplace=True)
 team_leaderboard.columns = ['Team','Total','PHR','Inside Cut']
 team_leaderboard = team_leaderboard.T.style.apply(highlight_rows_team_short,axis=0)
 
