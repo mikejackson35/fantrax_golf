@@ -65,6 +65,37 @@ def highlight_rows(row):
         color = '#73706a' # Grey
     return ['background-color: {}'.format(color) for r in row]
 
+teams_dict = {
+        '919':'Philly919',
+        'u_c':'unit_circle',
+        'NT 4':'New Team 4',
+        'NT 8':'Sneads Foot',
+        'txms':'txmoonshine',
+        'MG':'Team Gamble',
+        'grrr':'Putt Pirates',
+        '[AW]':'AlphaWired'
+        }
+
+def highlight_rows_team_short(row):
+    value = row.loc['Team']
+    if value == 'u_c':
+        color = '#c28bdd' # Purple
+    elif value == '919':
+        color = '#0ec3d2' # Aqua
+    elif value == '[AW]':
+        color = '#f7a05d' # Orange
+    elif value == 'NT 8':
+        color = '#46d671' # Green
+    elif value == 'NT 4':
+        color = '#f75e38' # Red
+    elif value == 'MG':
+        color = '#2693be' # Navy
+    elif value == 'txms':
+        color = '#dbc530' # Yellow
+    else:
+        color = '#73706a' # Grey
+    return ['background-color: {}'.format(color) for r in row]
+
 def highlight_cols(col):
 
     if col.team == 'unit_circle':

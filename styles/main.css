@@ -17,6 +17,12 @@
     display: none;
 }
 
-MainMenu {visibility: hidden;}
+/* .stMultiSelect > label {
+    font-size:105%; 
+    font-weight:bold; 
+    color:blue;
+}  */
+
+/* MainMenu {visibility: hidden;} */
 footer {visibility: hidden;}
 header {visibility: hidden;}
