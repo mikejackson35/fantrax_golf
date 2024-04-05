@@ -57,7 +57,7 @@ live_merged = live_merged[live_merged.index != 0].reset_index()
 live_merged[['round', 'thru']] = live_merged[['round', 'thru']].astype(int)
 # add columns matchup_num & holes_remaining
 live_merged['matchup_num'] = live_merged.team.map(matchups)
-live_merged['holes_remaining'] = (72 - (live_merged['thru']).fillna(0)).astype(int)
+live_merged['holes_remaining'] = (54 - (live_merged['thru']).fillna(0)).astype(int)
 live_merged['holes_remaining'] = np.where(live_merged['position']=='CUT',0,live_merged['holes_remaining']).astype('int')
 live_merged['holes_remaining'] = np.where(live_merged['position']=='WD',0,live_merged['holes_remaining']).astype('int')
 
@@ -92,7 +92,7 @@ team_leaderboard['inside_cut'] = team_leaderboard['team'].map(get_inside_cut(liv
 team_leaderboard['total'] = np.where(team_leaderboard['total'] == 0, "E", team_leaderboard['total']).astype(str)
 team_leaderboard.columns = ['Team','Total','PHR','Matchup','Inside Cut']
 team_leaderboard_bar_df = team_leaderboard.copy()
-team_leaderboard = team_leaderboard.style.apply(highlight_rows,axis=1)
+team_leaderboard = team_leaderboard.T.style.apply(highlight_rows,axis=0)
 
 # player leaderboard
 player_leaderboard = live_merged[['player', 'position', 'total', 'round', 'thru','team','matchup_num']].fillna(0)
@@ -113,6 +113,8 @@ live_merged_strokes_gained = live_merged_strokes_gained.style.background_gradien
 # header
 st.markdown("<h3 style='text-align: center;;'>The Valero</h3>", unsafe_allow_html=True)                    
 st.markdown("<h5 style='text-align: center;;'>Live Leaderboard</h5>", unsafe_allow_html=True)
+st.dataframe(team_leaderboard,                                                                   
+                            hide_index=False,height=225)#,use_container_width=True)
 # strokes gained expander
 with st.expander('Strokes Gained by Team'):                                                                   
     st.dataframe(live_merged_strokes_gained,
