@@ -59,8 +59,11 @@ live_merged[['total','round', 'thru']] = live_merged[['total','round', 'thru']].
 # add columns matchup_num & holes_remaining
 live_merged['matchup_num'] = live_merged.team.map(matchups)
 live_merged['holes_remaining'] = (54 - (live_merged['thru']).fillna(0)).astype(int)
-live_merged['holes_remaining'] = np.where(live_merged['position']=='CUT',0,live_merged['holes_remaining']).astype('int')
-live_merged['holes_remaining'] = np.where(live_merged['position']=='WD',0,live_merged['holes_remaining']).astype('int')
+# live_merged['holes_remaining'] = np.where(live_merged['position']=='CUT',0,live_merged['holes_remaining']).astype('int')
+# live_merged['holes_remaining'] = np.where(live_merged['position']=='WD',0,live_merged['holes_remaining']).astype('int')
+
+live_merged.loc[live_merged['position'].isin(['CUT', 'WD']), 'holes_remaining'] = 0
+live_merged['holes_remaining'] = live_merged['holes_remaining'].astype(int)
 
 "#" # ensures refreshed page starts at top
 st.markdown("<h3 style='text-align: center;;'>The Valero</h3>", unsafe_allow_html=True)   
