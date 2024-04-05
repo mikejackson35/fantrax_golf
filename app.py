@@ -114,8 +114,8 @@ player_leaderboard.columns = ['Player','Pos','Total','Rd','Thru','Team','Matchup
 player_leaderboard = player_leaderboard.style.apply(highlight_rows,axis=1)
 
 # strokes gained table
-strokes_gained_table = live_merged.groupby('team',as_index=False)[['sg_putt','sg_arg','sg_app','sg_ott','sg_t2g']].sum().reset_index(drop=True)
-strokes_gained_table.columns = ['Team','SG Putt','SG Arg','SG App','SG Ott','SG T2G']
+strokes_gained_table = live_merged.groupby('team',as_index=False)[['sg_putt','sg_arg','sg_app','sg_t2g']].sum().reset_index(drop=True)
+strokes_gained_table.columns = ['Team','SG Putt','SG Arg','SG App','SG T2G']
 strokes_gained_table = strokes_gained_table.style.background_gradient(cmap='Greens').format(precision=2)
 
 ### UI ###
