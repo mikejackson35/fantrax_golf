@@ -65,16 +65,12 @@ def highlight_rows(row):
         color = '#73706a' # Grey
     return ['background-color: {}'.format(color) for r in row]
 
-teams_dict = {
-        '919':'Philly919',
-        'u_c':'unit_circle',
-        'NT 4':'New Team 4',
-        'NT 8':'Sneads Foot',
-        'txms':'txmoonshine',
-        'MG':'Team Gamble',
-        'grrr':'Putt Pirates',
-        '[AW]':'AlphaWired'
-        }
+def plus_prefix(a):
+    if a > 0:
+        b = f"+{a}"
+    else:
+        b = a
+    return b
 
 def highlight_rows_team_short(row):
     value = row.loc['Team']

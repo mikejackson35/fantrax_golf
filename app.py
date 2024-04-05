@@ -3,7 +3,7 @@ import numpy as np
 import plotly.express as px
 import streamlit as st
 import altair as alt
-from utils import highlight_rows, teams_dict, get_inside_cut, remove_T_from_positions, team_color,fix_names, highlight_rows_team_short
+from utils import highlight_rows, teams_dict, get_inside_cut, remove_T_from_positions, team_color,fix_names, highlight_rows_team_short,plus_prefix
 # import secrets
 
 ##### LIBRARY CONFIGs AND SECRETS KEYS #####
@@ -97,6 +97,7 @@ team_leaderboard = team_leaderboard.sort_values('total').reset_index()
 team_leaderboard['team'] = team_leaderboard['team'].astype(str)
 team_leaderboard['team_short'] = team_leaderboard['team_short'].astype(str)
 team_leaderboard['inside_cut'] = team_leaderboard['team'].map(get_inside_cut(live_merged))
+team_leaderboard['total'] = team_leaderboard['total'].apply(plus_prefix)
 team_leaderboard['total'] = np.where(team_leaderboard['total'] == 0, "E", team_leaderboard['total']).astype(str)
 team_leaderboard_bar_df = team_leaderboard.copy()
 team_leaderboard.drop(columns='team',inplace=True)
@@ -106,7 +107,9 @@ team_leaderboard = team_leaderboard.T.style.apply(highlight_rows_team_short,axis
 
 # make player leaderboard
 player_leaderboard = live_merged[['player', 'position', 'total', 'round', 'thru','team','matchup_num']].fillna(0)
+player_leaderboard['total'] = player_leaderboard['total'].apply(plus_prefix)
 player_leaderboard['total'] = np.where(player_leaderboard['total'] == 0, "E", player_leaderboard['total']).astype(str)
+player_leaderboard['round'] = player_leaderboard['round'].apply(plus_prefix)
 player_leaderboard['round'] = np.where(player_leaderboard['round'] == 0, "E", player_leaderboard['round']).astype(str)
 player_leaderboard['position'] = np.where(player_leaderboard['position'] == "WAITING", "-", player_leaderboard['position'])
 player_leaderboard['thru'] = np.where(player_leaderboard['thru'] == 0, "-", player_leaderboard['thru']).astype(str)
