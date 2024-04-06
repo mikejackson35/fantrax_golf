@@ -14,7 +14,8 @@ with open(r"styles/main.css") as f:                                             
     st.markdown("<style>{}</style>".format(f.read()), unsafe_allow_html=True)    
 config = {'displayModeBar': False}                                                                    # plotly
 
-dg_key = st.secrets.dg_key                   
+# dg_key = st.secrets.dg_key                   
+dg_key = "e297e933c3ad47d71ec1626c299e"
 
 matchups = {                                    # enter weekly matchups here
     'unit_circle':1,
