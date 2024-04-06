@@ -3,7 +3,7 @@ import numpy as np
 import plotly.express as px
 import streamlit as st
 import altair as alt
-from utils import highlight_rows, teams_dict, get_inside_cut, remove_T_from_positions, team_color,fix_names, highlight_rows_team_short,plus_prefix
+from utils import highlight_rows, teams_dict, get_inside_cut, remove_T_from_positions, team_color,fix_names, highlight_rows_team_short,plus_prefix, get_inside_cut_weekend
 import secrets
 
 ##### LIBRARY CONFIGs AND SECRETS KEYS #####
@@ -14,8 +14,8 @@ with open(r"styles/main.css") as f:                                             
     st.markdown("<style>{}</style>".format(f.read()), unsafe_allow_html=True)    
 config = {'displayModeBar': False}                                                                    # plotly
 
-# dg_key = st.secrets.dg_key                   
-dg_key = "e297e933c3ad47d71ec1626c299e"
+dg_key = st.secrets.dg_key                   
+# dg_key = "e297e933c3ad47d71ec1626c299e"
 
 matchups = {                                    # enter weekly matchups here
     'unit_circle':1,
@@ -93,7 +93,7 @@ team_leaderboard = (live_merged[['team', 'team_short', 'total', 'holes_remaining
                     .astype({'team': str, 'team_short': str})
                    )
 
-team_leaderboard['inside_cut'] = team_leaderboard['team'].map(get_inside_cut(live_merged))
+team_leaderboard['inside_cut'] = team_leaderboard['team_short'].map(get_inside_cut_weekend(live_merged))
 team_leaderboard['total'] = team_leaderboard['total'].apply(plus_prefix)
 team_leaderboard['total'] = team_leaderboard['total'].replace('0', 'E').astype(str)
 team_leaderboard_bar_df = team_leaderboard.copy()
@@ -101,8 +101,7 @@ team_leaderboard_bar_df = team_leaderboard.copy()
 team_leaderboard.drop(columns='team',inplace=True)
 team_leaderboard.rename(columns={'team_short':'team'},inplace=True)
 team_leaderboard.columns = ['Team','Total','PHR','Inside Cut']
-
-team_leaderboard = team_leaderboard.T.style.apply(highlight_rows_team_short,axis=0)
+team_leaderboard = team_leaderboard.T.style.apply(highlight_rows_team_short,axis=0)#, column_config={'Team':None})
 
 # make player leaderboard
 player_leaderboard = live_merged[['player', 'total', 'position', 'round', 'thru','team','matchup_num']].fillna(0)

@@ -161,6 +161,14 @@ def get_inside_cut(live_merged):
     inside_cut_dict = dict(inside_cut_df.values)
     return inside_cut_dict
 
+def get_inside_cut_weekend(live_merged):
+
+    df_ = live_merged[(live_merged.position != 'WAITING') & (live_merged.position != 'CUT')]
+    s_ = df_.groupby('team_short')['player'].count()
+    inside_cut_weekend_dict = dict(s_)
+
+    return dict(inside_cut_weekend_dict)
+
 def fix_names(dg_live):
     """
     Takes in live datagolf scoring, cleans names, outputs list of active players this week
