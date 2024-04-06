@@ -58,7 +58,7 @@ live_merged = live_merged[live_merged.index != 0].reset_index()
 live_merged[['total','round', 'thru']] = live_merged[['total','round', 'thru']].astype(int)
 # add columns matchup_num & holes_remaining
 live_merged['matchup_num'] = live_merged.team.map(matchups)
-live_merged['holes_remaining'] = (54 - (live_merged['thru']).fillna(0)).astype(int)
+live_merged['holes_remaining'] = (36 - (live_merged['thru']).fillna(0)).astype(int)
 live_merged.loc[live_merged['position'].isin(['CUT', 'WD']), 'holes_remaining'] = 0
 live_merged['holes_remaining'] = live_merged['holes_remaining'].astype(int)
 
@@ -94,28 +94,28 @@ team_leaderboard = (live_merged[['team', 'team_short', 'total', 'holes_remaining
                    )
 
 team_leaderboard['inside_cut'] = team_leaderboard['team'].map(get_inside_cut(live_merged))
-
-# Format 'total' column
 team_leaderboard['total'] = team_leaderboard['total'].apply(plus_prefix)
 team_leaderboard['total'] = team_leaderboard['total'].replace('0', 'E').astype(str)
-
-
-# team_leaderboard['total'] = team_leaderboard['total'].apply(plus_prefix)
-# team_leaderboard['total'] = np.where(team_leaderboard['total'] == 0, "E", team_leaderboard['total']).astype(str)
 team_leaderboard_bar_df = team_leaderboard.copy()
+
 team_leaderboard.drop(columns='team',inplace=True)
 team_leaderboard.rename(columns={'team_short':'team'},inplace=True)
 team_leaderboard.columns = ['Team','Total','PHR','Inside Cut']
+
 team_leaderboard = team_leaderboard.T.style.apply(highlight_rows_team_short,axis=0)
 
 # make player leaderboard
 player_leaderboard = live_merged[['player', 'position', 'total', 'round', 'thru','team','matchup_num']].fillna(0)
+
 player_leaderboard['total'] = player_leaderboard['total'].apply(plus_prefix)
 player_leaderboard['total'] = np.where(player_leaderboard['total'] == 0, "E", player_leaderboard['total']).astype(str)
+
 player_leaderboard['round'] = player_leaderboard['round'].apply(plus_prefix)
 player_leaderboard['round'] = np.where(player_leaderboard['round'] == 0, "E", player_leaderboard['round']).astype(str)
+
 player_leaderboard['position'] = np.where(player_leaderboard['position'] == "WAITING", "-", player_leaderboard['position'])
 player_leaderboard['thru'] = np.where(player_leaderboard['thru'] == 0, "-", player_leaderboard['thru']).astype(str)
+
 player_leaderboard.columns = ['Player','Pos','Total','Rd','Thru','Team','Matchup']
 player_leaderboard = player_leaderboard.style.apply(highlight_rows,axis=1)
 
