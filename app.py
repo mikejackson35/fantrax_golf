@@ -105,7 +105,7 @@ team_leaderboard.columns = ['Team','Total','PHR','Inside Cut']
 team_leaderboard = team_leaderboard.T.style.apply(highlight_rows_team_short,axis=0)
 
 # make player leaderboard
-player_leaderboard = live_merged[['player', 'position', 'total', 'round', 'thru','team','matchup_num']].fillna(0)
+player_leaderboard = live_merged[['player', 'total', 'position', 'round', 'thru','team','matchup_num']].fillna(0)
 
 player_leaderboard['total'] = player_leaderboard['total'].apply(plus_prefix)
 player_leaderboard['total'] = np.where(player_leaderboard['total'] == 0, "E", player_leaderboard['total']).astype(str)
@@ -116,7 +116,7 @@ player_leaderboard['round'] = np.where(player_leaderboard['round'] == 0, "E", pl
 player_leaderboard['position'] = np.where(player_leaderboard['position'] == "WAITING", "-", player_leaderboard['position'])
 player_leaderboard['thru'] = np.where(player_leaderboard['thru'] == 0, "-", player_leaderboard['thru']).astype(str)
 
-player_leaderboard.columns = ['Player','Pos','Total','Rd','Thru','Team','Matchup']
+player_leaderboard.columns = ['Player','Total','Pos','Rd','Thru','Team','Matchup']
 player_leaderboard = player_leaderboard.style.apply(highlight_rows,axis=1)
 
 # strokes gained table
