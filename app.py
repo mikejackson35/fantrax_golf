@@ -4,7 +4,7 @@ import plotly.express as px
 import streamlit as st
 import altair as alt
 from utils import highlight_rows, teams_dict, get_inside_cut, remove_T_from_positions, team_color,fix_names, highlight_rows_team_short,plus_prefix
-# import secrets
+import secrets
 
 ##### LIBRARY CONFIGs AND SECRETS KEYS #####
 
@@ -14,8 +14,8 @@ with open(r"styles/main.css") as f:                                             
     st.markdown("<style>{}</style>".format(f.read()), unsafe_allow_html=True)    
 config = {'displayModeBar': False}                                                                    # plotly
 
-# dg_key = st.secrets.dg_key                                                                         # api keys
-dg_key = "e297e933c3ad47d71ec1626c299e"
+dg_key = st.secrets.dg_key                                                                         # api keys
+# dg_key = "e297e933c3ad47d71ec1626c299e"
 
 matchups = {                                    # enter weekly matchups here
     'unit_circle':1,
