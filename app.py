@@ -14,8 +14,7 @@ with open(r"styles/main.css") as f:                                             
     st.markdown("<style>{}</style>".format(f.read()), unsafe_allow_html=True)    
 config = {'displayModeBar': False}                                                                    # plotly
 
-dg_key = st.secrets.dg_key                   
-# dg_key = "e297e933c3ad47d71ec1626c299e"
+dg_key = st.secrets.dg_key                  
 
 matchups = {                                    # enter weekly matchups here
     'unit_circle':1,
@@ -58,7 +57,7 @@ live_merged = live_merged[live_merged.index != 0].reset_index()
 live_merged[['total','round', 'thru']] = live_merged[['total','round', 'thru']].astype(int)
 # add columns matchup_num & holes_remaining
 live_merged['matchup_num'] = live_merged.team.map(matchups)
-live_merged['holes_remaining'] = (36 - (live_merged['thru']).fillna(0)).astype(int)
+live_merged['holes_remaining'] = (18 - (live_merged['thru']).fillna(0)).astype(int)
 live_merged.loc[live_merged['position'].isin(['CUT', 'WD']), 'holes_remaining'] = 0
 live_merged['holes_remaining'] = live_merged['holes_remaining'].astype(int)
 
