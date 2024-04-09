@@ -62,8 +62,8 @@ live_merged.loc[live_merged['position'].isin(['CUT', 'WD']), 'holes_remaining'] 
 live_merged['holes_remaining'] = live_merged['holes_remaining'].astype(int)
 
 "#" # ensures refreshed page starts at top
-st.markdown("<h3 style='text-align: center;;'>The Valero</h3>", unsafe_allow_html=True)   
-st.markdown("<center>Week 13</center>",unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center;;'>The Masters</h3>", unsafe_allow_html=True)   
+st.markdown("<center>Week 14</center>",unsafe_allow_html=True)
 st.markdown("<center></center>",unsafe_allow_html=True)
 
 # team leaderboard and matchup filter
